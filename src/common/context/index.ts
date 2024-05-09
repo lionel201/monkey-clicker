@@ -6,4 +6,5 @@ export type StateDispatch<T> = Dispatch<SetStateAction<T>>
 
 export const NetworkContext = createContext<{
   networkContext: StateContext<Network>
+  secretKeyContext: StateContext<string>
 }>(null as any)

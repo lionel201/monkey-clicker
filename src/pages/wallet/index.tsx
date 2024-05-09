@@ -1,10 +1,11 @@
 import { Button, Input, Typography } from 'antd'
 import { AptosAccount, HexString } from 'aptos'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import { ModalWarningImportWallet } from '@/common/components/Modals/ModalWarningImportWallet'
 import { getData, setData } from '@/common/hooks/useLocalstorage'
 import { useModal } from '@/common/hooks/useModal'
+import { NetworkContext } from '@/common/context'
 
 export enum WARNING_MODE {
   NEW_WALLET,
@@ -21,16 +22,22 @@ export default function Home() {
   const [isImportSuccess, setIsImportSuccess] = useState<boolean>(false)
   const { show, setShow, toggle } = useModal()
 
+  const {
+    secretKeyContext: [_, setSecretKeyContext],
+  } = useContext(NetworkContext)
+
   useEffect(() => {
     const secretKeyLocal = getData('secretKey')
     if (secretKeyLocal) {
       const account = new AptosAccount(new HexString(JSON.parse(secretKeyLocal)).toUint8Array())
       setSecretKey(JSON.parse(secretKeyLocal))
+      setSecretKeyContext(JSON.parse(secretKeyLocal))
       setAddress(account.address())
     } else {
       const account = new AptosAccount()
       setAddress(account.address())
       setSecretKey(HexString.fromUint8Array(account.signingKey.secretKey).toString())
+      setSecretKeyContext(HexString.fromUint8Array(account.signingKey.secretKey).toString())
       setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.signingKey.secretKey).toString()))
     }
   }, [isImportSuccess])

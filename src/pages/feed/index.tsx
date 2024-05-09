@@ -2,12 +2,12 @@ import { useQuery } from '@tanstack/react-query'
 import { notification, Progress, Typography } from 'antd'
 import { AptosAccount, HexString } from 'aptos'
 import Image from 'next/image'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 
 import { CLICKER_RESOURCE_ACCOUNT } from '@/common/consts'
+import { NetworkContext } from '@/common/context'
 import useClient from '@/common/hooks/useClient'
 import useContract from '@/common/hooks/useContract'
-import { getData } from '@/common/hooks/useLocalstorage'
 
 const maxFoodAmount = 500
 
@@ -17,9 +17,10 @@ const Page: React.FunctionComponent = () => {
   const [totalFood, setTotalFood] = useState(0)
   const { view } = useContract()
   const { aptosClient } = useClient()
-  const [secretKey, setSecretKey] = useState(getData('secretKey') ? JSON.parse(getData('secretKey') as any) : '')
 
-  console.log(secretKey, secretKey)
+  const {
+    secretKeyContext: [secretKey],
+  } = useContext(NetworkContext)
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -32,31 +33,16 @@ const Page: React.FunctionComponent = () => {
     return () => clearInterval(interval)
   }, [totalFood])
 
-  const getIsRegister = async () => {
-    const account = new AptosAccount(new HexString(secretKey).toUint8Array())
-    const payload = {
-      function: `${CLICKER_RESOURCE_ACCOUNT}::clickr::is_registered`,
-      type_arguments: [],
-      arguments: [account.address().toString()],
-    }
-    const res = await view(payload)
-    if (!res[0]) {
-      await handleRegister()
-    }
-  }
-
   useEffect(() => {
     ;(async () => {
-      await getIsRegister()
-    })()
-  }, [secretKey])
-
-  useEffect(() => {
-    ;(async () => {
-      const account = new AptosAccount(new HexString(secretKey).toUint8Array())
-      const genesisAccount = await aptosClient.getAccount(account.address())
-      console.log('genesisAccount.sequence_number', genesisAccount.sequence_number)
-      setSequenceNumber(genesisAccount.sequence_number)
+      try {
+        const account = new AptosAccount(new HexString(secretKey as any).toUint8Array())
+        const genesisAccount = await aptosClient.getAccount(account.address())
+        console.log('genesisAccount.sequence_number', genesisAccount.sequence_number)
+        setSequenceNumber(genesisAccount.sequence_number)
+      } catch (e) {
+        console.log(e)
+      }
     })()
   }, [])
 
@@ -67,7 +53,7 @@ const Page: React.FunctionComponent = () => {
   } = useQuery({
     queryKey: ['currentPlays', secretKey],
     queryFn: async () => {
-      const account = new AptosAccount(new HexString(secretKey).toUint8Array())
+      const account = new AptosAccount(new HexString(secretKey as any).toUint8Array())
       const payload = {
         function: `${CLICKER_RESOURCE_ACCOUNT}::clickr::current_plays`,
         type_arguments: [],
@@ -76,6 +62,7 @@ const Page: React.FunctionComponent = () => {
       const res = await view(payload)
       return Number(res[0])
     },
+    enabled: !!secretKey,
   })
 
   useEffect(() => {
@@ -97,24 +84,6 @@ const Page: React.FunctionComponent = () => {
       }
     } catch (e) {
       throw e
-    }
-  }
-
-  const handleRegister = async () => {
-    try {
-      const account = new AptosAccount(new HexString(secretKey).toUint8Array())
-      const rawTxn = await aptosClient.generateTransaction(account.address(), {
-        function: `${CLICKER_RESOURCE_ACCOUNT}::clickr::register`,
-        type_arguments: [],
-        arguments: [],
-      })
-      setSequenceNumber(sequenceNumber + 1)
-      const tx = await aptosClient.signAndSubmitTransaction(account, rawTxn)
-      if (tx) {
-        await refetch()
-      }
-    } catch (e: any) {
-      console.log(e)
     }
   }
 
@@ -166,20 +135,16 @@ const Page: React.FunctionComponent = () => {
     )
     animation.onfinish = removeParticle
   }
-
   function removeParticle(e: any) {
     e.srcElement.effect.target.remove()
   }
-  console.log('111111111', sequenceNumber)
   const handleClick = async (e: any) => {
     try {
-      const account = new AptosAccount(new HexString(secretKey).toUint8Array())
       setTotalPlays(totalPlays + 1)
       setTotalFood(totalFood + 1)
       pop(e)
       setSequenceNumber(String(Number(sequenceNumber) + 1))
-      console.log('sequenceNumber', sequenceNumber)
-
+      const account = new AptosAccount(new HexString(secretKey as any).toUint8Array())
       const rawTxn = await aptosClient.generateTransaction(
         account.address(),
         {
@@ -188,14 +153,12 @@ const Page: React.FunctionComponent = () => {
           arguments: [],
         },
         {
-          sequence_number: Number(sequenceNumber) === 0 ? String(Number(sequenceNumber) + 1) : sequenceNumber,
+          sequence_number: sequenceNumber,
         },
       )
       const simulate = await simulateTransaction(account, rawTxn)
-
       console.log('simulate', simulate)
       const tx = await aptosClient.signAndSubmitTransaction(account, rawTxn)
-      console.log('tx', tx)
     } catch (e: any) {
       console.log(e.message)
       notification.error({ message: <div className="max-h-[70px] overflow-y-auto"> {e.message}</div> })

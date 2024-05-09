@@ -30,6 +30,7 @@ export default function Home() {
     } else {
       const account = new AptosAccount()
       setAddress(account.address())
+      setSecretKey(HexString.fromUint8Array(account.signingKey.secretKey).toString())
       setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.signingKey.secretKey).toString()))
     }
   }, [isImportSuccess])

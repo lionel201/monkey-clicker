@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { notification, Progress, Typography } from 'antd'
 import { AptosAccount, HexString } from 'aptos'
 import Image from 'next/image'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { CLICKER_RESOURCE_ACCOUNT } from '@/common/consts'
 import useClient from '@/common/hooks/useClient'
@@ -60,7 +60,11 @@ const Page: React.FunctionComponent = () => {
     })()
   }, [])
 
-  const { data: current_plays = 0, isFetching } = useQuery({
+  const {
+    data: current_plays = 0,
+    isFetching,
+    refetch,
+  } = useQuery({
     queryKey: ['currentPlays', secretKey],
     queryFn: async () => {
       const account = new AptosAccount(new HexString(secretKey).toUint8Array())
@@ -107,6 +111,7 @@ const Page: React.FunctionComponent = () => {
       setSequenceNumber(sequenceNumber + 1)
       const tx = await aptosClient.signAndSubmitTransaction(account, rawTxn)
       if (tx) {
+        await refetch()
       }
     } catch (e: any) {
       console.log(e)

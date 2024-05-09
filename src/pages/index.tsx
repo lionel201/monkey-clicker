@@ -168,7 +168,7 @@ const Page: React.FunctionComponent = () => {
               if (accountIsCreated) {
                 await handleClick(e)
               } else {
-                notification.error({ message: 'Account has not been created.' })
+                notification.error({ message: 'You need to fund the game wallet with apt first.' })
               }
             }}
             className="w-[320px] sm:w-[420px] tickle-box h-[320px] sm:h-[420px] flex justify-center items-center bg-[#EEC5C7] rounded-full"

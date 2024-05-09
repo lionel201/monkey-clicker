@@ -17,7 +17,9 @@ const Page: React.FunctionComponent = () => {
   const [totalFood, setTotalFood] = useState(0)
   const { view } = useContract()
   const { aptosClient } = useClient()
-  const secretKey = useMemo(() => (getData('secretKey') ? JSON.parse(getData('secretKey') ?? '') : ''), [])
+  const [secretKey, setSecretKey] = useState(getData('secretKey') ? JSON.parse(getData('secretKey') as any) : '')
+
+  console.log(secretKey, secretKey)
 
   useEffect(() => {
     const interval = setInterval(() => {

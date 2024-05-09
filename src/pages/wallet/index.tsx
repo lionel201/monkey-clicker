@@ -22,8 +22,8 @@ export default function Home() {
   const { show, setShow, toggle } = useModal()
 
   const {
-    addressContext: [addressContext],
-    secretKeyContext: [secretKeyContext, setAddressContext],
+    addressContext: [addressContext, setAddressContext],
+    secretKeyContext: [secretKeyContext, setSecretKeyContext],
   } = useContext(NetworkContext)
 
   useEffect(() => {
@@ -54,6 +54,8 @@ export default function Home() {
       console.log('account', account)
       if (account) {
         setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.signingKey.secretKey).toString()))
+        setAddressContext(account.address().toString())
+        setSecretKeyContext(HexString.fromUint8Array(account.signingKey.secretKey).toString())
         setIsImportSuccess(true)
         setIsImport(false)
         toggle()
@@ -68,7 +70,7 @@ export default function Home() {
   const handleGenerateNewWallet = () => {
     try {
       const account = new AptosAccount()
-      setAddressContext(account.address().toString())
+      setSecretKeyContext(account.address().toString())
       setSecretKey(HexString.fromUint8Array(account.signingKey.secretKey).toString())
       setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.signingKey.secretKey).toString()))
       setIsImportSuccess(true)

@@ -8,8 +8,8 @@ import { getData, setData } from '@/common/hooks/useLocalstorage'
 
 export const LayoutPage: React.FunctionComponent<{ children: ReactNode }> = ({ children }) => {
   const {
-    secretKeyContext: [_, setSecretKeyContext],
-    addressContext: [address, setAddressContext],
+    secretKeyContext: [secretKey, setSecretKeyContext],
+    addressContext: [_, setAddressContext],
   } = useContext(NetworkContext)
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export const LayoutPage: React.FunctionComponent<{ children: ReactNode }> = ({ c
       setAddressContext(account.address().toString())
       setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.signingKey.secretKey).toString()))
     }
-  }, [])
+  }, [secretKey])
 
   return (
     <>

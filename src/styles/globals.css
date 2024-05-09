@@ -68,7 +68,7 @@ particle {
 }
 
 .ant-notification-notice {
-    background-color: #313845 !important;
+    background-color: #fcfcfc !important;
 }
 
 .ant-notification-notice-message {
@@ -120,4 +120,31 @@ particle {
 }
 .slick-slide > div {
     padding: 0 12px !important;
+}
+
+.slick-next,
+.slick-prev {
+    display: none !important;
+}
+
+
+.headerNav_mobileClosed {
+    height: 0;
+}
+.headerNav_mobileOpen {
+    height: 100%;
+    max-height: calc(100vh);
+}
+
+.header-nav-mobile{
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    overflow: hidden;
+    background-color: #ffffff;
+    transition-property: all;
+    transition-duration: .5s;
+    transition-timing-function: cubic-bezier(.4,0,.2,1);
+
 }

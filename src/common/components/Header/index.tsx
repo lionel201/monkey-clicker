@@ -9,6 +9,7 @@ import { routes } from '@/common/components/Header/routers'
 import { Logo } from '@/common/components/Icons/common'
 import { NetworkContext } from '@/common/context'
 import { getData, setData } from '@/common/hooks/useLocalstorage'
+import { Squash as Hamburger } from 'hamburger-react'
 
 import styles from './Header.module.scss'
 
@@ -17,6 +18,8 @@ const { Header } = Layout
 export const HeaderPage: React.FunctionComponent = () => {
   const [pageName, setPageName] = useState('')
   const [network, setNetwork] = useState('')
+  const [isOpen, setOpen] = useState(false)
+
   const router = useRouter()
 
   const {
@@ -37,14 +40,45 @@ export const HeaderPage: React.FunctionComponent = () => {
     setPageName(router.pathname.replace('/', ''))
   }, [router])
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'auto'
+    }
+  }, [isOpen])
+
   return (
-    <Header className="z-20 w-full flex items-center pb-0 bg-[#FFF] h-[60px]  sm:h-[75px] px-0 mobile:py-2 ">
+    <Header className="z-20 w-full flex items-center pb-0 bg-[#FFF] h-[60px]  sm:h-[75px] px-0 mobile:py-2 relative">
+      {isOpen && (
+        <div
+          className={`header-nav-mobile top-[60px] sm:top-[70px] ${isOpen ? 'headerNav_mobileOpen' : 'headerNav_mobileClosed'}`}
+        >
+          <div className={'h-full w-full py-4 px-5'}>
+            <ul className={'space-y-0'}>
+              {routes.map(({ path, name }) => {
+                return (
+                  <li>
+                    <Link
+                      href={`/${path}`}
+                      onClick={() => setOpen(false)}
+                      className={` font-bold text-base ${pageName === path ? 'text-[#CA5C3B]' : 'text-[#8C8C8C]'}`}
+                    >
+                      {name}
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        </div>
+      )}
       <div className="md:container max-w-[1536px] md:mx-auto w-full px-4 lg:px-8">
         <div className="mx-auto h-full w-full top-0 left-0 flex items-center justify-between relative">
           <div className={classNames('left-0 top-0 flex items-center relative')}>
-            <Link href="" target="_blank" className={classNames('h-full flex items-center justify-center')}>
+            <Link href="/" className={classNames('h-full flex items-center justify-center')}>
               <div className="flex items-center gap-2 relative">
-                <Logo />
+                <Logo className={'w-[50px] sm:w-[78px]'} />
               </div>
             </Link>
           </div>
@@ -100,6 +134,9 @@ export const HeaderPage: React.FunctionComponent = () => {
               >
                 Testnet
               </Button>
+            </div>
+            <div className={'block md:hidden'}>
+              <Hamburger color={'#CA5C3B'} size={24} toggled={isOpen} toggle={setOpen} />
             </div>
           </div>
         </div>

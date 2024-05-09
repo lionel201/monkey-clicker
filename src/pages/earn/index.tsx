@@ -11,7 +11,11 @@ const Page: React.FunctionComponent = () => {
           <h1 className="text-[#000000] font-bold text-3xl">Earn more HEART</h1>
           <HeartIcon className="w-[30px] h-auto" />
         </div>
-        <TaskList />
+        <div className={'mt-10'}>
+          <TaskList title={'Daily Task'} />
+          <TaskList title={'Onboarding Task'} />
+          <TaskList title={'Social Task'} />
+        </div>
       </div>
     </div>
   )

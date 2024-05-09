@@ -30,8 +30,6 @@ export default function Home() {
     setSecretKey(secretKeyContext)
   }, [secretKeyContext])
 
-  console.log('addressContext', addressContext)
-
   const handleShowImport = () => {
     try {
       const account = new AptosAccount(new HexString(secretKeyInput as any).toUint8Array())
@@ -82,7 +80,7 @@ export default function Home() {
   }
 
   return (
-    <div className="py-20 px-5">
+    <div className="pt-10 sm:pt-20 pb-20 px-5">
       <div className="text-center max-w-[570px] mx-auto">
         <h1 className="text-[#000000] text-center text-2xl font-semibold">Wallet</h1>
         <Typography className="text-[#000000] font-semibold mt-10 text-lg">Your Aptos address:</Typography>

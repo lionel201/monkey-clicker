@@ -179,7 +179,7 @@ const Page: React.FunctionComponent = () => {
               </div>
               <div
                 className={
-                  'text-2xl no-select font-bold pointer-events-none cursor-not-allowed text-[#FFFFFF] text-center mt-5'
+                  'text-xl sm:text-2xl no-select font-bold pointer-events-none cursor-not-allowed text-[#FFFFFF] text-center mt-5'
                 }
               >
                 Tickle me to Earn

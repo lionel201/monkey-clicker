@@ -18,6 +18,13 @@ export default function Document() {
           href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap"
           rel="stylesheet"
         />
+        <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick.css" />
+
+        <link
+          rel="stylesheet"
+          type="text/css"
+          href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick-theme.css"
+        />
       </Head>
       <body>
         <Main />

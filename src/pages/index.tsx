@@ -4,7 +4,6 @@ import { AptosAccount, HexString } from 'aptos'
 import React, { useContext, useEffect, useState } from 'react'
 
 import { CatTicker, HandIcon, HeartIcon, LineIcon, MouseIcon } from '@/common/components/Icons/common'
-import { CLICKER_RESOURCE_ACCOUNT } from '@/common/consts'
 import { NetworkContext } from '@/common/context'
 import useClient from '@/common/hooks/useClient'
 import useContract from '@/common/hooks/useContract'
@@ -18,7 +17,7 @@ const Page: React.FunctionComponent = () => {
   const [totalFood, setTotalFood] = useState(0)
   const [accountIsCreated, setAccountIsCreated] = useState(true)
   const { view } = useContract()
-  const { aptosClient } = useClient()
+  const { aptosClient, CLICKER_RESOURCE_ACCOUNT } = useClient()
 
   const {
     secretKeyContext: [secretKey],

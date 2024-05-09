@@ -21,6 +21,7 @@ export const LayoutPage: React.FunctionComponent<{ children: ReactNode }> = ({ c
     } else {
       const account = new AptosAccount()
       setSecretKeyContext(HexString.fromUint8Array(account.signingKey.secretKey).toString())
+      setAddressContext(account.address().toString())
       setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.signingKey.secretKey).toString()))
     }
   }, [])

@@ -1,7 +1,6 @@
 import { AptosClient, CoinClient, FungibleAssetClient, IndexerClient, Network, Provider } from 'aptos'
-import { useMemo } from 'react'
+import { useContext, useMemo } from 'react'
 
-import { ENV, envNane } from '@/common/consts'
 import {
   // DEVNET_NODE_URL,
   MAINNET_INDEXER_URL,
@@ -9,19 +8,33 @@ import {
   TESTNET_INDEXER_URL,
   TESTNET_NODE_URL,
 } from '@/config/aptosConstants'
+import { NetworkContext } from '@/common/context'
 
 const useClient = () => {
+  const {
+    networkContext: [networkContext],
+  } = useContext(NetworkContext)
+
   const { aptosClient } = useMemo(() => {
     return {
-      aptosClient: ENV === envNane.TESTNET ? new AptosClient(TESTNET_NODE_URL) : new AptosClient(MAINNET_NODE_URL),
+      aptosClient:
+        networkContext === Network.TESTNET ? new AptosClient(TESTNET_NODE_URL) : new AptosClient(MAINNET_NODE_URL),
     }
   }, [])
 
-  const provider = new Provider(ENV === envNane.TESTNET ? Network.TESTNET : Network.MAINNET)
+  const CLICKER_RESOURCE_ACCOUNT_TESTNET = '0xff9659c0da82a6701e5641584a05ca03576bed4c994ab677dd6d12fe679f6615'
+  const CLICKER_RESOURCE_ACCOUNT_MAINNET = '0xff9659c0da82a6701e5641584a05ca03576bed4c994ab677dd6d12fe679f6615'
+
+  const CLICKER_RESOURCE_ACCOUNT =
+    networkContext === Network.TESTNET ? CLICKER_RESOURCE_ACCOUNT_TESTNET : CLICKER_RESOURCE_ACCOUNT_MAINNET
+
+  const provider = new Provider(networkContext === Network.TESTNET ? Network.TESTNET : Network.MAINNET)
   const coinClient = new CoinClient(provider)
   const fungibleAsset = new FungibleAssetClient(provider)
-  const indexerClient = new IndexerClient(ENV === envNane.TESTNET ? TESTNET_INDEXER_URL : MAINNET_INDEXER_URL)
-  return { coinClient, aptosClient, fungibleAsset, provider, indexerClient }
+  const indexerClient = new IndexerClient(
+    networkContext === Network.TESTNET ? TESTNET_INDEXER_URL : MAINNET_INDEXER_URL,
+  )
+  return { coinClient, aptosClient, fungibleAsset, provider, indexerClient, CLICKER_RESOURCE_ACCOUNT }
 }
 
 export default useClient

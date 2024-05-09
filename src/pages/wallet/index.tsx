@@ -30,6 +30,8 @@ export default function Home() {
     setSecretKey(secretKeyContext)
   }, [secretKeyContext])
 
+  console.log('addressContext', addressContext)
+
   const handleShowImport = () => {
     try {
       const account = new AptosAccount(new HexString(secretKeyInput as any).toUint8Array())

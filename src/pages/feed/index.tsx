@@ -38,7 +38,7 @@ const Page: React.FunctionComponent = () => {
     })()
   }, [])
 
-  const { data: isRegister = false } = useQuery({
+  const { data: isRegister = false, refetch: refetchRegister } = useQuery({
     queryKey: ['isRegister'],
     queryFn: async () => {
       const account = new AptosAccount(new HexString(secretKey).toUint8Array())
@@ -96,15 +96,12 @@ const Page: React.FunctionComponent = () => {
         type_arguments: [],
         arguments: [],
       })
-      const simulate = await simulateTransaction(account, rawTxn)
-      if (!simulate) {
-        return
-      }
       const pendingTxn: any = await aptosClient.signAndSubmitTransaction(account, rawTxn)
       console.log('pendingTxn', pendingTxn)
       const rs: any = await aptosClient.waitForTransactionWithResult(pendingTxn)
       if (rs.success) {
         return true
+        await refetchRegister()
       } else {
         return false
       }

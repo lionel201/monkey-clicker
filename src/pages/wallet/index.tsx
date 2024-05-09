@@ -94,27 +94,27 @@ export default function Home() {
   return (
     <div className="py-20 px-5">
       <div className="text-center max-w-[570px] mx-auto">
-        <h1 className="text-[#fff] text-center text-2xl font-semibold">Wallet</h1>
-        <Typography className="text-[#fff] font-semibold mt-10 text-lg">Your Aptos address:</Typography>
+        <h1 className="text-[#000000] text-center text-2xl font-semibold">Wallet</h1>
+        <Typography className="text-[#000000] font-semibold mt-10 text-lg">Your Aptos address:</Typography>
         <p className="mt-3">
           This is the Aptos address of your spam wallet. Send $APT to this address to fund your wallet and start mining.
         </p>
         <div
           style={{ wordBreak: 'break-word' }}
-          className="bg-[#1A4E44] flex items-center justify-center text-[#fff] text-center border-0 mt-8 min-h-14 p-5 rounded-[16px]"
+          className="bg-[#ff000026] flex items-center justify-center text-[#000] text-center border-0 mt-8 min-h-14 p-5 rounded-[16px]"
         >
           {address.toString() as any}
         </div>
       </div>
       <div className="text-center max-w-[570px] mx-auto mt-10">
-        <h1 className="text-[#fff] text-center text-2xl font-semibold">Your secret key:</h1>
+        <h1 className="text-[#000000] text-center text-2xl font-semibold">Your secret key:</h1>
         <p className="mt-3">
           This is the private key of your spam wallet. Import it into a Sui mobile or browser wallet to withdraw the
           $APT you mine.
         </p>
         <div
           style={{ wordBreak: 'break-word' }}
-          className="bg-[#1A4E44] text-[#fff] border-0 mt-8 min-h-14 flex items-center rounded-[16px] p-5"
+          className="bg-[#ff000026] text-[#000] border-0 mt-8 min-h-14 flex items-center rounded-[16px] p-5"
         >
           {secretKey as string}
         </div>
@@ -123,7 +123,7 @@ export default function Home() {
         <div className="mt-10 flex justify-center gap-2">
           <Button
             onClick={handleShowWarningNewWallet}
-            className="bg-[#6ADAB3] text-[#000] border-0 font-medium rounded-[100px] h-10 min-w-[100px]"
+            className="bg-[#CA5C3B] text-[#fff] border-0 font-medium rounded-[100px] h-10 min-w-[100px]"
           >
             New Wallet
           </Button>
@@ -132,14 +132,14 @@ export default function Home() {
               setIsImport(true)
               setIsImportSuccess(false)
             }}
-            className="bg-transparent border-[#6ADAB3] text-[#6ADAB3] font-medium rounded-[100px] h-10 min-w-[100px]"
+            className="bg-transparent border-[#CA5C3B] text-[#CA5C3B] font-medium rounded-[100px] h-10 min-w-[100px]"
           >
             Import
           </Button>
         </div>
         {isImport && (
           <div className="mt-10 text-center">
-            <Typography className="text-[#fff] font-semibold  text-lg">Import wallet</Typography>
+            <Typography className="text-[text-[#000000]] font-semibold  text-lg">Import wallet</Typography>
             <p className="mt-5">Paste your secret key and click the import button.</p>
             <Input
               value={secretKeyInput as string}
@@ -168,7 +168,7 @@ export default function Home() {
         {isImportSuccess && <p className="text-[#90ee90] font-semibold text-base mt-5">Success</p>}
       </div>
       <div className="text-center mt-14">
-        <Typography className="text-[#fff] font-semibold  text-lg">Back up your secret key!</Typography>
+        <Typography className="text-[#000000] font-semibold  text-lg">Back up your secret key!</Typography>
         <p className="font-medium mt-3">Your spam wallet is stored in your browser, only you have access to it.</p>
         <p className="font-medium">Clearing cookies will delete your wallet, and we cannot recover it for you.</p>
         <p className="font-medium">Copy your secret key and keep it safe, this allows you to restore your wallet.</p>

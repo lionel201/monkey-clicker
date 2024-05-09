@@ -15,6 +15,7 @@ const Page: React.FunctionComponent = () => {
   const [sequenceNumber, setSequenceNumber] = useState('1')
   const [totalPlays, setTotalPlays] = useState(0)
   const [totalFood, setTotalFood] = useState(0)
+  const [accountIsCreated, setAccountIsCreated] = useState(true)
   const { view } = useContract()
   const { aptosClient } = useClient()
 
@@ -37,20 +38,24 @@ const Page: React.FunctionComponent = () => {
     ;(async () => {
       try {
         const account = new AptosAccount(new HexString(secretKey as any).toUint8Array())
+        if (account) {
+          setAccountIsCreated(true)
+        }
         const genesisAccount = await aptosClient.getAccount(account.address())
         console.log('genesisAccount.sequence_number', genesisAccount.sequence_number)
         setSequenceNumber(genesisAccount.sequence_number)
-      } catch (e) {
+      } catch (e: any) {
         console.log(e)
+        if (e.message.includes('Account not found')) {
+          setAccountIsCreated(false)
+        } else {
+          notification.error({ message: <div className="max-h-[70px] overflow-y-auto"> {e.message}</div> })
+        }
       }
     })()
   }, [])
 
-  const {
-    data: current_plays = 0,
-    isFetching,
-    refetch,
-  } = useQuery({
+  const { data: current_plays = 0 } = useQuery({
     queryKey: ['currentPlays', secretKey],
     queryFn: async () => {
       const account = new AptosAccount(new HexString(secretKey as any).toUint8Array())
@@ -176,7 +181,13 @@ const Page: React.FunctionComponent = () => {
         </div>
         <div className="flex justify-center mt-10">
           <Image
-            onClick={handleClick}
+            onClick={async (e) => {
+              if (accountIsCreated) {
+                await handleClick(e)
+              } else {
+                notification.error({ message: 'Account has not been created yet!', placement: 'bottomRight' })
+              }
+            }}
             id="monkey"
             className="w-[180px] cursor-pointer "
             src={require('@/common/assets/images/monkey.png')}

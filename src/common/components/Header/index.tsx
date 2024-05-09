@@ -1,12 +1,12 @@
 import { Button, Layout, Menu } from 'antd'
 import { Network } from 'aptos'
 import { default as classNames, default as cx } from 'classnames'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useContext, useEffect, useState } from 'react'
 
 import { routes } from '@/common/components/Header/routers'
+import { Logo } from '@/common/components/Icons/common'
 import { NetworkContext } from '@/common/context'
 
 import styles from './Header.module.scss'
@@ -32,11 +32,7 @@ export const HeaderPage: React.FunctionComponent = () => {
           <div className={classNames('left-0 top-0 flex items-center relative')}>
             <Link href="" target="_blank" className={classNames('h-full flex items-center justify-center')}>
               <div className="flex items-center gap-2 relative">
-                <Image
-                  className="w-[60px] h-auto hidden sm:block"
-                  src={require('@/common/assets/images/logo.png')}
-                  alt=""
-                />
+                <Logo />
               </div>
             </Link>
           </div>
@@ -56,11 +52,12 @@ export const HeaderPage: React.FunctionComponent = () => {
                 )}
               >
                 {routes.map(({ name, path }) => {
+                  console.log('pageName', pageName)
                   return (
                     <Menu.Item className={`${pageName === path && 'menu-active'} h-full mx-2 pr-2`} key={name}>
                       <Link
                         href={`/${path}` || '/'}
-                        className="h6 font-medium text-[#fff] relative flex items-center h-full"
+                        className="h6 font-medium text-[#8C8C8C] relative flex items-center h-full"
                         style={{ fontSize: '16px' }}
                       >
                         {name}
@@ -72,12 +69,12 @@ export const HeaderPage: React.FunctionComponent = () => {
             </Menu>
           </div>
           <div className=" h-full w-fit flex items-center gap-x-2">
-            <div className="bg-[#1A4E44] flex rounded-full p-1">
+            <div className="bg-[#ff000026] flex rounded-full p-1">
               <Button
                 onClick={() => {
                   setNetwork(Network.MAINNET)
                 }}
-                className={`${network === Network.MAINNET ? 'bg-[#6ADAB3] text-[#000]' : 'bg-transparent text-[#E6E6E6]'}  rounded-full border-0`}
+                className={`${network === Network.MAINNET ? 'bg-[#CA5C3B] text-[#fff]' : 'bg-transparent text-[#000]'}  rounded-full border-0`}
               >
                 Mainnet
               </Button>
@@ -85,7 +82,7 @@ export const HeaderPage: React.FunctionComponent = () => {
                 onClick={() => {
                   setNetwork(Network.TESTNET)
                 }}
-                className={`${network === Network.TESTNET ? 'bg-[#6ADAB3] text-[#000]' : 'bg-transparent text-[#E6E6E6]'} border-0 rounded-full`}
+                className={`${network === Network.TESTNET ? 'bg-[#CA5C3B] text-[#fff]' : 'bg-transparent text-[#000]'} border-0 rounded-full`}
               >
                 Testnet
               </Button>

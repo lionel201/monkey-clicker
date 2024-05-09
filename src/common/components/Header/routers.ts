@@ -1,18 +1,22 @@
 export const routes = [
   {
     path: '',
-    name: 'Home',
-  },
-  {
-    path: 'feed',
-    name: 'Feed',
+    name: 'Tickle',
   },
   {
     path: 'wallet',
     name: 'Wallet',
   },
   {
-    path: 'rpcs',
-    name: 'RPCs',
+    path: 'earn',
+    name: 'Earn',
+  },
+  {
+    path: 'leaderboard',
+    name: 'Leaderboard',
+  },
+  {
+    path: 'referral',
+    name: 'Referral',
   },
 ]

@@ -3,9 +3,9 @@ import { AptosAccount, HexString } from 'aptos'
 import { useContext, useEffect, useState } from 'react'
 
 import { ModalWarningImportWallet } from '@/common/components/Modals/ModalWarningImportWallet'
+import { NetworkContext } from '@/common/context'
 import { getData, setData } from '@/common/hooks/useLocalstorage'
 import { useModal } from '@/common/hooks/useModal'
-import { NetworkContext } from '@/common/context'
 
 export enum WARNING_MODE {
   NEW_WALLET,

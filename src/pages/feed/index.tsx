@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { notification, Progress, Typography } from 'antd'
 import { AptosAccount, HexString } from 'aptos'
 import Image from 'next/image'
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import { CLICKER_RESOURCE_ACCOUNT } from '@/common/consts'
 import { NetworkContext } from '@/common/context'

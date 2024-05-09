@@ -119,7 +119,7 @@ export default function Home() {
           {secretKey as string}
         </div>
 
-        <p className="text-[#FF6464] mt-3">0{`Don't share your secret key with anyone`}</p>
+        <p className="text-[#FF6464] mt-3">{`Don't share your secret key with anyone`}</p>
         <div className="mt-10 flex justify-center gap-2">
           <Button
             onClick={handleShowWarningNewWallet}
@@ -152,7 +152,7 @@ export default function Home() {
             <div>
               <Button
                 onClick={handleShowImport}
-                className="bg-[#6ADAB3] mt-5 text-[#000] border-0 font-medium rounded-[100px] h-10 min-w-[100px]"
+                className="bg-[#CA5C3B] text-[#fff] mt-5 border-0 font-medium rounded-[100px] h-10 min-w-[100px]"
               >
                 Import
               </Button>

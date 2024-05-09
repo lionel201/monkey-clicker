@@ -4,6 +4,9 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
+        <title>Aptos Spam</title>
+        <link rel="icon" href="/logo.png" />
+        <link rel="apple-touch-icon" sizes="192x192" href="/logo.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link

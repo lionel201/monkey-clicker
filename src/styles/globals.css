@@ -56,16 +56,15 @@ particle {
 }
 
 .game-layout {
-    height: calc(100vh - 75px);
+    min-height: calc(100vh - 75px);
 }
 
 .font-pacifico {
     font-family: "Pacifico", cursive;
 }
 
-.monkey:active {
+.tickle-box:active .cat {
     transform: scale(0.95);
-    transition: ease-in-oute 0.2s;
 }
 
 .ant-notification-notice {
@@ -74,7 +73,7 @@ particle {
 
 .ant-notification-notice-message {
     color: #FF6464 !important;
-    font-size: 14px !important;
+    font-size: 16px !important;
 }
 
 .ant-notification-notice-close-icon {
@@ -98,4 +97,20 @@ particle {
 
 .exo-2 {
     font-family: "Exo 2", sans-serif !important;
+}
+
+.no-select{
+    -moz-user-select: none !important;
+    -webkit-touch-callout: none!important;
+    -webkit-user-select: none!important;
+    -khtml-user-select: none!important;
+    -moz-user-select: none!important;
+    -ms-user-select: none!important;
+    user-select: none!important;
+}
+
+@media (max-width: 765px) {
+    .game-layout {
+        min-height: calc(90vh) !important;
+    }
 }

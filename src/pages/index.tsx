@@ -3,7 +3,7 @@ import { notification, Progress, Typography } from 'antd'
 import { AptosAccount, HexString } from 'aptos'
 import React, { useContext, useEffect, useState } from 'react'
 
-import { CatTicker, HandIcon, HeartIcon } from '@/common/components/Icons/common'
+import { CatTicker, HandIcon, HeartIcon, LineIcon, MouseIcon } from '@/common/components/Icons/common'
 import { CLICKER_RESOURCE_ACCOUNT } from '@/common/consts'
 import { NetworkContext } from '@/common/context'
 import useClient from '@/common/hooks/useClient'
@@ -140,9 +140,11 @@ const Page: React.FunctionComponent = () => {
     )
     animation.onfinish = removeParticle
   }
+
   function removeParticle(e: any) {
     e.srcElement.effect.target.remove()
   }
+
   const handleClick = async (e: any) => {
     try {
       setTotalPlays(totalPlays + 1)
@@ -171,35 +173,50 @@ const Page: React.FunctionComponent = () => {
   }
 
   return (
-    <div className="game-layout flex items-center justify-center">
+    <div className="game-layout relative flex  justify-center items-center py-10">
+      <div className={'absolute bottom-0 hidden sm:block left-0'}>
+        <LineIcon />
+        <div className={'absolute -right-20 top-5'}>
+          <MouseIcon />
+        </div>
+      </div>
       <div className="min-w-[350px] ">
         <div className="flex justify-center items-center gap-3">
           <div>
             <HeartIcon />
           </div>
-          <Typography className="text-4xl text-[#000000] font-black font-pacifico">{totalFood}</Typography>
+          <Typography className="text-5xl text-[#000000] font-black font-pacifico">{totalPlays}</Typography>
         </div>
         <div className="flex justify-center mt-10">
           <div
-            id="monkey"
             onClick={async (e) => {
               if (accountIsCreated) {
                 await handleClick(e)
               } else {
-                notification.error({ message: 'Account has not been created yet!', placement: 'bottomRight' })
+                notification.error({ message: 'Account has not been created.' })
               }
             }}
-            className="w-[450px] h-[450px] flex justify-center items-center bg-[#EEC5C7] rounded-full"
+            className="w-[320px] sm:w-[420px] tickle-box h-[320px] sm:h-[420px] flex justify-center items-center bg-[#EEC5C7] rounded-full"
           >
-            <CatTicker />
+            <div>
+              <div className={'cat'}>
+                <CatTicker className={'w-[200px] sm:w-[255px] h-auto'} />
+              </div>
+              <div
+                className={
+                  'text-2xl no-select font-bold pointer-events-none cursor-not-allowed text-[#FFFFFF] text-center mt-5'
+                }
+              >
+                Tickle me to Earn
+              </div>
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-3 mt-10">
-          <span className="text-[#080708] text-lg exo-2">{totalFood}</span>
+          <span className="text-[#080708] text-lg no-select exo-2">{totalFood}</span>
           <Progress
             className=""
-            // percent={(totalFood / maxFoodAmount) * 100}
-            percent={30}
+            percent={(totalFood / maxFoodAmount) * 100}
             trailColor="#101119"
             showInfo={false}
             status="active"

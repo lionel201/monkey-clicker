@@ -8,6 +8,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { routes } from '@/common/components/Header/routers'
 import { Logo } from '@/common/components/Icons/common'
 import { NetworkContext } from '@/common/context'
+import { getData, setData } from '@/common/hooks/useLocalstorage'
 
 import styles from './Header.module.scss'
 
@@ -15,18 +16,29 @@ const { Header } = Layout
 
 export const HeaderPage: React.FunctionComponent = () => {
   const [pageName, setPageName] = useState('')
+  const [network, setNetwork] = useState('')
   const router = useRouter()
 
   const {
-    networkContext: [network, setNetwork],
+    networkContext: [networkContext, setNetworkContext],
   } = useContext(NetworkContext)
+
+  useEffect(() => {
+    const netWorkLocal = getData('network')
+    if (netWorkLocal) {
+      setNetworkContext(netWorkLocal as Network)
+      setNetwork(netWorkLocal)
+    } else {
+      setNetwork(networkContext as Network)
+    }
+  }, [networkContext])
 
   useEffect(() => {
     setPageName(router.pathname.replace('/', ''))
   }, [router])
 
   return (
-    <Header className="z-20 w-full flex items-center pb-0 bg-transparent h-[60px]  sm:h-[75px] px-0 mobile:py-2 ">
+    <Header className="z-20 w-full flex items-center pb-0 bg-[#FFF] h-[60px]  sm:h-[75px] px-0 mobile:py-2 ">
       <div className="md:container max-w-[1536px] md:mx-auto w-full px-4 lg:px-8">
         <div className="mx-auto h-full w-full top-0 left-0 flex items-center justify-between relative">
           <div className={classNames('left-0 top-0 flex items-center relative')}>
@@ -73,16 +85,18 @@ export const HeaderPage: React.FunctionComponent = () => {
               <Button
                 onClick={() => {
                   setNetwork(Network.MAINNET)
+                  setData('network', Network.MAINNET)
                 }}
-                className={`${network === Network.MAINNET ? 'bg-[#CA5C3B] text-[#fff]' : 'bg-transparent text-[#000]'}  rounded-full border-0`}
+                className={`${network == Network.MAINNET ? 'bg-[#CA5C3B] text-[#fff]' : 'bg-transparent text-[#000]'}  rounded-full border-0`}
               >
                 Mainnet
               </Button>
               <Button
                 onClick={() => {
                   setNetwork(Network.TESTNET)
+                  setData('network', Network.TESTNET)
                 }}
-                className={`${network === Network.TESTNET ? 'bg-[#CA5C3B] text-[#fff]' : 'bg-transparent text-[#000]'} border-0 rounded-full`}
+                className={`${network == Network.TESTNET ? 'bg-[#CA5C3B] text-[#fff]' : 'bg-transparent text-[#000]'} border-0 rounded-full`}
               >
                 Testnet
               </Button>

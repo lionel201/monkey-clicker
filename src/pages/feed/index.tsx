@@ -102,7 +102,10 @@ const Page: React.FunctionComponent = () => {
         type_arguments: [],
         arguments: [],
       })
-      await aptosClient.signAndSubmitTransaction(account, rawTxn)
+      const tx = await aptosClient.signAndSubmitTransaction(account, rawTxn)
+      if (tx) {
+        setSequenceNumber(sequenceNumber + 1)
+      }
     } catch (e: any) {
       console.log(e)
     }

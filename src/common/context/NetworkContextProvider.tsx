@@ -9,8 +9,13 @@ import { NetworkContext } from '.'
 const NetworkContextProvider = ({ children }: PropsWithChildren) => {
   const networkContext = useState<Network>((getData('network') as Network) ?? Network.TESTNET)
   const secretKeyContext = useState<string>(getData('secretKey') ? JSON.parse(getData('secretKey') as any) : '')
+  const addressContext = useState<string>('')
 
-  return <NetworkContext.Provider value={{ networkContext, secretKeyContext }}>{children}</NetworkContext.Provider>
+  return (
+    <NetworkContext.Provider value={{ networkContext, secretKeyContext, addressContext }}>
+      {children}
+    </NetworkContext.Provider>
+  )
 }
 
 export default NetworkContextProvider

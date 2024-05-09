@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react'
 
 import { ModalWarningImportWallet } from '@/common/components/Modals/ModalWarningImportWallet'
 import { NetworkContext } from '@/common/context'
-import { getData, setData } from '@/common/hooks/useLocalstorage'
+import { setData } from '@/common/hooks/useLocalstorage'
 import { useModal } from '@/common/hooks/useModal'
 
 export enum WARNING_MODE {
@@ -14,7 +14,6 @@ export enum WARNING_MODE {
 
 export default function Home() {
   const [mode, setMode] = useState(WARNING_MODE.NEW_WALLET)
-  const [address, setAddress] = useState<HexString | string>('')
   const [secretKey, setSecretKey] = useState<HexString | string>('')
   const [isImport, setIsImport] = useState<boolean>(false)
   const [secretKeyInput, setSecretKeyInput] = useState<HexString | string>('')
@@ -23,24 +22,13 @@ export default function Home() {
   const { show, setShow, toggle } = useModal()
 
   const {
-    secretKeyContext: [_, setSecretKeyContext],
+    addressContext: [addressContext],
+    secretKeyContext: [secretKeyContext, setAddressContext],
   } = useContext(NetworkContext)
 
   useEffect(() => {
-    const secretKeyLocal = getData('secretKey')
-    if (secretKeyLocal) {
-      const account = new AptosAccount(new HexString(JSON.parse(secretKeyLocal)).toUint8Array())
-      setSecretKey(JSON.parse(secretKeyLocal))
-      setSecretKeyContext(JSON.parse(secretKeyLocal))
-      setAddress(account.address())
-    } else {
-      const account = new AptosAccount()
-      setAddress(account.address())
-      setSecretKey(HexString.fromUint8Array(account.signingKey.secretKey).toString())
-      setSecretKeyContext(HexString.fromUint8Array(account.signingKey.secretKey).toString())
-      setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.signingKey.secretKey).toString()))
-    }
-  }, [isImportSuccess])
+    setSecretKey(secretKeyContext)
+  }, [secretKeyContext])
 
   const handleShowImport = () => {
     try {
@@ -80,7 +68,7 @@ export default function Home() {
   const handleGenerateNewWallet = () => {
     try {
       const account = new AptosAccount()
-      setAddress(account.address())
+      setAddressContext(account.address().toString())
       setSecretKey(HexString.fromUint8Array(account.signingKey.secretKey).toString())
       setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.signingKey.secretKey).toString()))
       setIsImportSuccess(true)
@@ -103,7 +91,7 @@ export default function Home() {
           style={{ wordBreak: 'break-word' }}
           className="bg-[#ff000026] flex items-center justify-center text-[#000] text-center border-0 mt-8 min-h-14 p-5 rounded-[16px]"
         >
-          {address.toString() as any}
+          {addressContext.toString() as any}
         </div>
       </div>
       <div className="text-center max-w-[570px] mx-auto mt-10">

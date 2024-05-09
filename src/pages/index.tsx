@@ -8,7 +8,7 @@ import { CLICKER_RESOURCE_ACCOUNT } from '@/common/consts'
 import { NetworkContext } from '@/common/context'
 import useClient from '@/common/hooks/useClient'
 import useContract from '@/common/hooks/useContract'
-import { pop } from '@/common/utils'
+import { getDiff, pop } from '@/common/utils'
 
 const maxFoodAmount = 500
 
@@ -72,6 +72,25 @@ const Page: React.FunctionComponent = () => {
     enabled: !!secretKey,
   })
 
+  const { data: endTime = 0 } = useQuery({
+    queryKey: ['isEnded', secretKey],
+    queryFn: async () => {
+      const account = new AptosAccount(new HexString(secretKey as any).toUint8Array())
+      const payload = {
+        function: `${CLICKER_RESOURCE_ACCOUNT}::clickr::end_time`,
+        type_arguments: [],
+        arguments: [],
+      }
+      const res = await view(payload)
+      return Number(res[0])
+    },
+    enabled: !!secretKey,
+  })
+
+  const isEnded = getDiff(endTime * 1000) < 0
+
+  console.log('endTime', endTime)
+
   useEffect(() => {
     setTotalPlays(current_plays)
   }, [current_plays])
@@ -95,6 +114,10 @@ const Page: React.FunctionComponent = () => {
   }
 
   const handleClick = async (e: any) => {
+    if (isEnded) {
+      notification.error({ message: <div className="max-h-[70px] overflow-y-auto">Time ended!</div> })
+      return null
+    }
     if (!secretKey) {
       notification.error({ message: <div className="max-h-[70px] overflow-y-auto">Account not found!</div> })
       return null

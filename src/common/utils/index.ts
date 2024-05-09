@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 export function pop(e: any) {
   const amount = 1
   if (e.clientX === 0 && e.clientY === 0) {
@@ -49,4 +51,8 @@ function createParticle(x: number, y: number, type: string) {
 
 function removeParticle(e: any) {
   e.srcElement.effect.target.remove()
+}
+
+export const getDiff = (withdrawTime: any) => {
+  return moment(parseInt(withdrawTime)).diff(Date.now())
 }

@@ -8,6 +8,7 @@ import { CLICKER_RESOURCE_ACCOUNT } from '@/common/consts'
 import { NetworkContext } from '@/common/context'
 import useClient from '@/common/hooks/useClient'
 import useContract from '@/common/hooks/useContract'
+import { pop } from '@/common/utils'
 
 const maxFoodAmount = 500
 
@@ -36,24 +37,25 @@ const Page: React.FunctionComponent = () => {
 
   useEffect(() => {
     ;(async () => {
-      try {
-        const account = new AptosAccount(new HexString(secretKey as any).toUint8Array())
-        if (account) {
-          setAccountIsCreated(true)
-        }
-        const genesisAccount = await aptosClient.getAccount(account.address())
-        console.log('genesisAccount.sequence_number', genesisAccount.sequence_number)
-        setSequenceNumber(genesisAccount.sequence_number)
-      } catch (e: any) {
-        console.log(e)
-        if (e.message.includes('Account not found')) {
-          setAccountIsCreated(false)
-        } else {
-          notification.error({ message: <div className="max-h-[70px] overflow-y-auto"> {e.message}</div> })
-        }
-      }
+      await getAccountInfo()
     })()
-  }, [])
+  }, [secretKey])
+
+  const getAccountInfo = async () => {
+    try {
+      const account = new AptosAccount(new HexString(secretKey as any).toUint8Array())
+      if (account) {
+        setAccountIsCreated(true)
+      }
+      const genesisAccount = await aptosClient.getAccount(account.address())
+      setSequenceNumber(genesisAccount.sequence_number)
+    } catch (e: any) {
+      console.log(e)
+      if (e.message.includes('Account not found')) {
+        setAccountIsCreated(false)
+      }
+    }
+  }
 
   const { data: current_plays = 0 } = useQuery({
     queryKey: ['currentPlays', secretKey],
@@ -92,60 +94,11 @@ const Page: React.FunctionComponent = () => {
     }
   }
 
-  function pop(e: any) {
-    const amount = 1
-    if (e.clientX === 0 && e.clientY === 0) {
-      const bbox = e.target.getBoundingClientRect()
-      const x = bbox.left + bbox.width / 2
-      const y = bbox.top + bbox.height / 2
-      for (let i = 0; i < 30; i++) {
-        createParticle(x, y, e.target.dataset.type)
-      }
-    } else {
-      for (let i = 0; i < amount; i++) {
-        createParticle(e.clientX, e.clientY + window.scrollY, 'mario')
-      }
-    }
-  }
-
-  function createParticle(x: number, y: number, type: string) {
-    const particle = document.createElement('particle')
-    document.body.appendChild(particle)
-    const width = 30
-    const height = width
-    const destinationY = -300
-    const rotation = 0
-    const delay = 100
-    const arr = ['/apple.png', '/banana.png', '/peach.png', '/watermelon.png', '/strawberry.png']
-    const image = arr[Math.floor(Math.random() * arr.length)]
-    particle.style.backgroundImage = `url(${image})`
-    particle.style.width = `${width}px`
-    particle.style.height = `${height}px`
-    const animation = particle.animate(
-      [
-        {
-          transform: `translateY(50%) translate(${x}px, ${y}px) rotate(0deg)`,
-          opacity: 1,
-        },
-        {
-          transform: `translateY(50%) translate(${x}px, ${y + destinationY}px) rotate(${rotation}deg)`,
-          opacity: 0.5,
-        },
-      ],
-      {
-        duration: 500,
-        easing: 'cubic-bezier(0, 1, .57, 1)',
-        delay,
-      },
-    )
-    animation.onfinish = removeParticle
-  }
-
-  function removeParticle(e: any) {
-    e.srcElement.effect.target.remove()
-  }
-
   const handleClick = async (e: any) => {
+    if (!secretKey) {
+      notification.error({ message: <div className="max-h-[70px] overflow-y-auto">Account not found!</div> })
+      return null
+    }
     try {
       setTotalPlays(totalPlays + 1)
       setTotalFood(totalFood + 1)

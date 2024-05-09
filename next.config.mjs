@@ -29,7 +29,7 @@ const nextConfig = {
     "rc-tooltip",
       "rc-notification"
   ],
-  reactStrictMode: true,
+  reactStrictMode: false,
 };
 
 export default nextConfig;

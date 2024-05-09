@@ -20,8 +20,8 @@ export const Logo = () => (
   </svg>
 )
 
-export const HeartIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="38" height="47" viewBox="0 0 38 47" fill="none">
+export const HeartIcon: React.FunctionComponent<{ className?: string }> = ({ className }) => (
+  <svg className={className} xmlns="http://www.w3.org/2000/svg" width="38" height="47" viewBox="0 0 38 47" fill="none">
     <path
       d="M28.0869 2.00698C34.699 -4.03371 39.0706 6.61675 37.6106 12.3417C36.8424 19.7505 34.7368 26.9747 31.397 33.6601C29.6648 36.0898 25.9676 48.9325 22.6166 46.6525C22.4799 46.5672 22.3518 46.4686 22.2343 46.3583C15.0679 45.9999 1.3703 17.5619 1.02326 10.1278C-0.463425 2.41405 6.48387 -1.17878 12.4754 3.23268C16.9489 6.19735 19.3271 11.2725 22.0424 15.731C23.4927 11.0139 24.9092 5.93235 28.0869 2.00698Z"
       fill="#CA5C3B"
@@ -296,6 +296,30 @@ export const MouseIcon = () => (
     <path
       d="M28.8916 17.4745C29.8804 18.1889 31.0194 18.6678 32.2216 18.8744C33.2302 19.0507 34.2674 18.9587 35.2292 18.6077C36.1911 18.2567 37.0437 17.6589 37.7016 16.8744V16.8044C36.3982 14.9388 34.6306 13.4456 32.5734 12.4722C30.5162 11.4989 28.2406 11.0792 25.9716 11.2545C25.9316 11.6468 25.9316 12.0422 25.9716 12.4345C26.0679 13.435 26.3787 14.4029 26.8825 15.2726C27.3864 16.1423 28.0716 16.8932 28.8916 17.4745Z"
       fill="#EBB38D"
+    />
+  </svg>
+)
+
+export const LeftIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+    <path
+      d="M15 18.7041L9 12.7041L15 6.7041"
+      stroke="#EEC5C7"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+export const RightIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+    <path
+      d="M9 18.7041L15 12.7041L9 6.7041"
+      stroke="#EEC5C7"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 )

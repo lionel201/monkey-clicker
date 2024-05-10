@@ -8,6 +8,7 @@ import { NetworkContext } from '@/common/context'
 import useClient from '@/common/hooks/useClient'
 import useContract from '@/common/hooks/useContract'
 import { getDiff, pop } from '@/common/utils'
+import { formatNumberBalance } from '@/utils'
 
 const maxFoodAmount = 500
 
@@ -160,7 +161,9 @@ const Page: React.FunctionComponent = () => {
           <div>
             <HeartIcon />
           </div>
-          <Typography className="text-5xl text-[#000000] font-black font-pacifico">{totalPlays}</Typography>
+          <Typography className="text-5xl text-[#000000] font-black font-pacifico">
+            {formatNumberBalance(totalPlays, 0)}
+          </Typography>
         </div>
         <div className="flex justify-center mt-10">
           <div

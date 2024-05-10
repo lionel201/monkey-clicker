@@ -6,6 +6,7 @@ import { ModalWarningImportWallet } from '@/common/components/Modals/ModalWarnin
 import { NetworkContext } from '@/common/context'
 import { setData } from '@/common/hooks/useLocalstorage'
 import { useModal } from '@/common/hooks/useModal'
+import { TickleStep } from '@/common/components/TickleStep'
 
 export enum WARNING_MODE {
   NEW_WALLET,
@@ -51,7 +52,6 @@ export default function Home() {
   const handleImport = () => {
     try {
       const account = new AptosAccount(new HexString(secretKeyInput as any).toUint8Array())
-      console.log('account', account)
       if (account) {
         setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.signingKey.secretKey).toString()))
         setAddressContext(account.address().toString())
@@ -83,9 +83,10 @@ export default function Home() {
 
   return (
     <div className="pt-10 sm:pt-20 pb-20 px-5">
-      <div className="text-center max-w-[570px] mx-auto">
-        <h1 className="text-[#000000] text-center text-2xl font-semibold">Wallet</h1>
-        <Typography className="text-[#000000] font-semibold mt-10 text-lg">Your Aptos address:</Typography>
+      <h1 className="text-[#000000] text-center text-2xl sm:text-3xl font-semibold">Your Tickle Wallet</h1>
+      <TickleStep />
+      <div className={'max-w-[570px] mx-auto text-center '}>
+        <Typography className="text-[#000000] font-semibold mt-16 text-lg">Your Aptos address:</Typography>
         <p className="mt-3">
           This is the Aptos address of your spam wallet. Send $APT to this address to fund your wallet and start mining.
         </p>
@@ -95,73 +96,74 @@ export default function Home() {
         >
           {addressContext.toString() as any}
         </div>
-      </div>
-      <div className="text-center max-w-[570px] mx-auto mt-10">
-        <h1 className="text-[#000000] text-center text-2xl font-semibold">Your secret key:</h1>
-        <p className="mt-3">
-          This is the private key of your spam wallet. Import it into a Aptos mobile or browser wallet to withdraw the
-          $APT you mine.
-        </p>
-        <div
-          style={{ wordBreak: 'break-word' }}
-          className="bg-[#ff000026] text-[#000] border-0 mt-8 min-h-14 flex items-center rounded-[16px] p-5"
-        >
-          {secretKey as string}
-        </div>
 
-        <p className="text-[#FF6464] mt-3">{`Don't share your secret key with anyone`}</p>
-        <div className="mt-10 flex justify-center gap-2">
-          <Button
-            onClick={handleShowWarningNewWallet}
-            className="bg-[#CA5C3B] text-[#fff] border-0 font-medium rounded-[100px] h-10 min-w-[100px]"
+        <div className="text-center max-w-[570px] mx-auto mt-10">
+          <h1 className="text-[#000000] text-center text-2xl font-semibold">Your secret key:</h1>
+          <p className="mt-3">
+            This is the private key of your spam wallet. Import it into a Aptos mobile or browser wallet to withdraw the
+            $APT you mine.
+          </p>
+          <div
+            style={{ wordBreak: 'break-word' }}
+            className="bg-[#ff000026] text-[#000] border-0 mt-8 min-h-14 flex items-center rounded-[16px] p-5"
           >
-            New Wallet
-          </Button>
-          <Button
-            onClick={() => {
-              setIsImport(true)
-              setIsImportSuccess(false)
-            }}
-            className="bg-transparent border-[#CA5C3B] text-[#CA5C3B] font-medium rounded-[100px] h-10 min-w-[100px]"
-          >
-            Import
-          </Button>
-        </div>
-        {isImport && (
-          <div className="mt-10 text-center">
-            <Typography className="text-[text-[#000000]] font-semibold  text-lg">Import wallet</Typography>
-            <p className="mt-5">Paste your secret key and click the import button.</p>
-            <Input
-              value={secretKeyInput as string}
-              onChange={(e) => {
-                setSecretKeyInput(e.target.value)
-                setError('')
-              }}
-              className="max-w-[300px] text-center mt-5 h-12 rounded-[16px]"
-            />
-            <div>
-              <Button
-                onClick={handleShowImport}
-                className="bg-[#CA5C3B] text-[#fff] mt-5 border-0 font-medium rounded-[100px] h-10 min-w-[100px]"
-              >
-                Import
-              </Button>
-              {error && (
-                <div className="text-[#FF6464] text-base mt-5">
-                  <p>Invalid secret key:</p>
-                  <p>{error}</p>
-                </div>
-              )}
-            </div>
+            {secretKey as string}
           </div>
-        )}
-        {isImportSuccess && <p className="text-[#90ee90] font-semibold text-base mt-5">Success</p>}
-      </div>
-      <div className="text-center mt-14">
-        <Typography className="text-[#000000] font-semibold  text-lg">Back up your secret key!</Typography>
-        <p className="font-medium mt-3">Your spam wallet is stored in your browser, only you have access to it.</p>
-        <p className="font-medium">Clearing cookies will delete your wallet, and we cannot recover it for you.</p>
-        <p className="font-medium">Copy your secret key and keep it safe, this allows you to restore your wallet.</p>
+
+          <p className="text-[#FF6464] mt-3">{`Don't share your secret key with anyone`}</p>
+          <div className="mt-10 flex justify-center gap-2">
+            <Button
+              onClick={handleShowWarningNewWallet}
+              className="bg-[#CA5C3B] text-[#fff] border-0 font-medium rounded-[100px] h-10 min-w-[100px]"
+            >
+              New Wallet
+            </Button>
+            <Button
+              onClick={() => {
+                setIsImport(true)
+                setIsImportSuccess(false)
+              }}
+              className="bg-transparent border-[#CA5C3B] text-[#CA5C3B] font-medium rounded-[100px] h-10 min-w-[100px]"
+            >
+              Import
+            </Button>
+          </div>
+          {isImport && (
+            <div className="mt-10 text-center">
+              <Typography className="text-[text-[#000000]] font-semibold  text-lg">Import wallet</Typography>
+              <p className="mt-5">Paste your secret key and click the import button.</p>
+              <Input
+                value={secretKeyInput as string}
+                onChange={(e) => {
+                  setSecretKeyInput(e.target.value)
+                  setError('')
+                }}
+                className="max-w-[300px] text-center mt-5 h-12 rounded-[16px]"
+              />
+              <div>
+                <Button
+                  onClick={handleShowImport}
+                  className="bg-[#CA5C3B] text-[#fff] mt-5 border-0 font-medium rounded-[100px] h-10 min-w-[100px]"
+                >
+                  Import
+                </Button>
+                {error && (
+                  <div className="text-[#FF6464] text-base mt-5">
+                    <p>Invalid secret key:</p>
+                    <p>{error}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          {isImportSuccess && <p className="text-[#90ee90] font-semibold text-base mt-5">Success</p>}
+        </div>
+        <div className="text-center mt-14">
+          <Typography className="text-[#000000] font-semibold  text-lg">Back up your secret key!</Typography>
+          <p className="font-medium mt-3">Your tickle wallet is stored in your browser, only you have access to it.</p>
+          <p className="font-medium">Clearing cookies will delete your wallet, and we cannot recover it for you.</p>
+          <p className="font-medium">Copy your secret key and keep it safe, this allows you to restore your wallet.</p>
+        </div>
       </div>
       <ModalWarningImportWallet
         isModalOpen={!!show}

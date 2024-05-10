@@ -13,6 +13,7 @@ import { formatNumberBalance } from '@/utils'
 const maxFoodAmount = 500
 
 const Page: React.FunctionComponent = () => {
+  const [loading, setLoading] = useState(true)
   const [sequenceNumber, setSequenceNumber] = useState('1')
   const [totalPlays, setTotalPlays] = useState(0)
   const [totalFood, setTotalFood] = useState(0)
@@ -72,10 +73,9 @@ const Page: React.FunctionComponent = () => {
     enabled: !!secretKey,
   })
 
-  const { data: endTime = 0 } = useQuery({
+  const { data: endTime = 0, isFetching } = useQuery({
     queryKey: ['isEnded', secretKey],
     queryFn: async () => {
-      const account = new AptosAccount(new HexString(secretKey as any).toUint8Array())
       const payload = {
         function: `${CLICKER_RESOURCE_ACCOUNT}::clickr::end_time`,
         type_arguments: [],
@@ -87,9 +87,11 @@ const Page: React.FunctionComponent = () => {
     enabled: !!secretKey,
   })
 
-  const isEnded = getDiff(endTime * 1000) < 0
+  useEffect(() => {
+    setLoading(isFetching)
+  }, [isFetching])
 
-  console.log('endTime', endTime)
+  const isEnded = getDiff(endTime * 1000) < 0
 
   useEffect(() => {
     setTotalPlays(current_plays)
@@ -144,7 +146,7 @@ const Page: React.FunctionComponent = () => {
       )
       const simulate = await simulateTransaction(account, rawTxn)
       console.log('simulate', simulate)
-      const tx = await aptosClient.signAndSubmitTransaction(account, rawTxn)
+      await aptosClient.signAndSubmitTransaction(account, rawTxn)
     } catch (e: any) {
       console.log(e.message)
       notification.error({ message: <div className="max-h-[70px] overflow-y-auto"> {e.message}</div> })
@@ -153,64 +155,68 @@ const Page: React.FunctionComponent = () => {
 
   return (
     <div className="game-layout relative flex  justify-center items-center py-10">
-      <div className={'absolute bottom-0 hidden sm:block left-0'}>
-        <LineIcon />
-        <div className={'absolute -right-20 top-5'}>
-          <MouseIcon />
-        </div>
-      </div>
-      <div className="min-w-[350px] ">
-        <div className="flex justify-center items-center gap-3">
-          <div>
-            <HeartIcon />
-          </div>
-          <Typography className="text-5xl text-[#000000] font-black font-pacifico">
-            {formatNumberBalance(totalPlays, 0)}
-          </Typography>
-        </div>
-        <div className="flex justify-center mt-10">
-          <div
-            onClick={async (e) => {
-              if (accountIsCreated) {
-                await handleClick(e)
-              } else {
-                notification.error({ message: 'You need to fund the game wallet with apt first.' })
-              }
-            }}
-            className="w-[320px] sm:w-[420px] tickle-box h-[320px] sm:h-[420px] flex justify-center items-center bg-[#EEC5C7] rounded-full"
-          >
-            <div>
-              <div className={'cat'}>
-                <CatTicker className={'w-[200px] sm:w-[255px] h-auto'} />
-              </div>
-              <div
-                className={
-                  'text-xl sm:text-2xl no-select font-bold pointer-events-none cursor-not-allowed text-[#FFFFFF] text-center mt-5'
-                }
-              >
-                Tickle me to Earn
-              </div>
+      {!loading ? (
+        <div>
+          <div className={'absolute bottom-0 hidden sm:block left-0'}>
+            <LineIcon />
+            <div className={'absolute -right-20 top-5'}>
+              <MouseIcon />
             </div>
           </div>
+          <div className="min-w-[350px] ">
+            <div className="flex justify-center items-center gap-3">
+              <div>
+                <HeartIcon />
+              </div>
+              <Typography className="text-5xl text-[#000000] font-black font-pacifico">
+                {formatNumberBalance(totalPlays, 0)}
+              </Typography>
+            </div>
+            <div className="flex justify-center mt-10">
+              <div
+                onClick={async (e) => {
+                  if (accountIsCreated) {
+                    await handleClick(e)
+                  } else {
+                    notification.error({ message: 'You need to fund the game wallet with apt first.' })
+                  }
+                }}
+                className="w-[320px] sm:w-[420px] tickle-box h-[320px] sm:h-[420px] flex justify-center items-center bg-[#EEC5C7] rounded-full"
+              >
+                <div>
+                  <div className={'cat'}>
+                    <CatTicker className={'w-[200px] sm:w-[255px] h-auto'} />
+                  </div>
+                  <div
+                    className={
+                      'text-xl sm:text-2xl no-select font-bold pointer-events-none cursor-not-allowed text-[#FFFFFF] text-center mt-5'
+                    }
+                  >
+                    Tickle me to Earn
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 mt-10">
+              <span className="text-[#080708] text-lg no-select exo-2">{totalFood}</span>
+              <Progress
+                className=""
+                percent={(totalFood / maxFoodAmount) * 100}
+                trailColor="#101119"
+                showInfo={false}
+                status="active"
+                strokeColor={{
+                  '0%': '#FC90FF',
+                  '100%': '#6C48FF',
+                }}
+                strokeWidth={14}
+              />
+              <HandIcon />
+            </div>
+            <span className="preloader"></span>
+          </div>
         </div>
-        <div className="flex items-center gap-3 mt-10">
-          <span className="text-[#080708] text-lg no-select exo-2">{totalFood}</span>
-          <Progress
-            className=""
-            percent={(totalFood / maxFoodAmount) * 100}
-            trailColor="#101119"
-            showInfo={false}
-            status="active"
-            strokeColor={{
-              '0%': '#FC90FF',
-              '100%': '#6C48FF',
-            }}
-            strokeWidth={14}
-          />
-          <HandIcon />
-        </div>
-        <span className="preloader"></span>
-      </div>
+      ) : null}
     </div>
   )
 }

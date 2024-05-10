@@ -29,7 +29,7 @@ export const LayoutPage: React.FunctionComponent<{ children: ReactNode }> = ({ c
   return (
     <>
       <HeaderPage />
-      {children}
+      <div className={'min-h-screen'}>{children}</div>
       <Footer />
     </>
   )

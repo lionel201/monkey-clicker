@@ -99,7 +99,7 @@ export default function Home() {
       <div className="text-center max-w-[570px] mx-auto mt-10">
         <h1 className="text-[#000000] text-center text-2xl font-semibold">Your secret key:</h1>
         <p className="mt-3">
-          This is the private key of your spam wallet. Import it into a Sui mobile or browser wallet to withdraw the
+          This is the private key of your spam wallet. Import it into a Aptos mobile or browser wallet to withdraw the
           $APT you mine.
         </p>
         <div

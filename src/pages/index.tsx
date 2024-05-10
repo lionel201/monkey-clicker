@@ -114,13 +114,16 @@ const Page: React.FunctionComponent = () => {
   }
 
   const handleClick = async (e: any) => {
+    if (totalFood >= 500) {
+      return
+    }
     if (isEnded) {
       notification.error({ message: <div className="max-h-[70px] overflow-y-auto">Time ended!</div> })
-      return null
+      return
     }
     if (!secretKey) {
       notification.error({ message: <div className="max-h-[70px] overflow-y-auto">Account not found!</div> })
-      return null
+      return
     }
     try {
       setTotalPlays(totalPlays + 1)

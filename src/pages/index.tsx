@@ -28,7 +28,7 @@ const Page: React.FunctionComponent = () => {
       if (totalFood > 0) {
         setTotalFood(totalFood - 1)
       }
-    }, 1000)
+    }, 500)
 
     //Clearing the interval
     return () => clearInterval(interval)

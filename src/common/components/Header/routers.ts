@@ -15,8 +15,8 @@ export const routes = [
     path: 'leaderboard',
     name: 'Leaderboard',
   },
-  {
-    path: 'referral',
-    name: 'Referral',
-  },
+  // {
+  //   path: 'referral',
+  //   name: 'Referral',
+  // },
 ]

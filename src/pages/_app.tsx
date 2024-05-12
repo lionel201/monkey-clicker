@@ -6,8 +6,14 @@ import type { AppProps } from 'next/app'
 import { LayoutPage } from '@/common/components/Layout/LayoutPage'
 import NetworkContextProvider from '@/common/context/NetworkContextProvider'
 import queryClient from '@/config/queryClient'
+import { useEffect } from 'react'
+import { telegram } from '@/common/hooks/telegramBot'
 
 export default function App({ Component, pageProps }: AppProps) {
+  useEffect(() => {
+    telegram.ready()
+  }, [])
+
   return (
     <QueryClientProvider client={queryClient}>
       <NetworkContextProvider>

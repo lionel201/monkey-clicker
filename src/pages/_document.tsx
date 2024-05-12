@@ -26,6 +26,7 @@ export default function Document() {
           href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick-theme.css"
         />
         <link rel="stylesheet" href="odometer-theme-default.css" />
+        <script src="https://telegram.org/js/telegram-web-app.js"></script>
       </Head>
       <body>
         <Main />

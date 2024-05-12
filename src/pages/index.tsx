@@ -3,7 +3,7 @@ import { notification, Progress, Typography } from 'antd'
 import { AptosAccount, HexString } from 'aptos'
 import React, { useContext, useEffect, useState } from 'react'
 
-import { CatTicker, HandIcon, HeartIcon, LineIcon, MouseIcon } from '@/common/components/Icons/common'
+import { CatTicker, CatTickleLimit, HandIcon, HeartIcon, LineIcon, MouseIcon } from '@/common/components/Icons/common'
 import { NetworkContext } from '@/common/context'
 import useClient from '@/common/hooks/useClient'
 import useContract from '@/common/hooks/useContract'
@@ -185,14 +185,16 @@ const Page: React.FunctionComponent = () => {
               >
                 <div>
                   <div className={'cat'}>
-                    <CatTicker className={'w-[200px] sm:w-[255px] h-auto'} />
+                    {totalFood === maxFoodAmount && <CatTickleLimit className={'w-[150px] sm:w-[180px] h-auto'} />}
+                    {totalFood !== maxFoodAmount && <CatTicker className={'w-[200px] sm:w-[255px] h-auto'} />}
                   </div>
                   <div
                     className={
                       'text-xl sm:text-2xl no-select font-bold pointer-events-none cursor-not-allowed text-[#FFFFFF] text-center mt-5'
                     }
                   >
-                    Tickle me to Earn
+                    {totalFood === maxFoodAmount && 'meowwwwww......'}
+                    {totalFood !== maxFoodAmount && 'Tickle me to Earn'}
                   </div>
                 </div>
               </div>

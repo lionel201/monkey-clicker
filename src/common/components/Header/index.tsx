@@ -98,7 +98,6 @@ export const HeaderPage: React.FunctionComponent = () => {
                 )}
               >
                 {routes.map(({ name, path }) => {
-                  console.log('pageName', pageName)
                   return (
                     <Menu.Item className={`${pageName === path && 'menu-active'} h-full mx-2 pr-2`} key={name}>
                       <Link

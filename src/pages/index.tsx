@@ -3,7 +3,15 @@ import { notification, Progress, Typography } from 'antd'
 import { AptosAccount, HexString } from 'aptos'
 import React, { useContext, useEffect, useState } from 'react'
 
-import { CatTicker, CatTickleLimit, HandIcon, HeartIcon, LineIcon, MouseIcon } from '@/common/components/Icons/common'
+import {
+  CatDefault,
+  CatTicker,
+  CatTickleLimit,
+  HandIcon,
+  HeartIcon,
+  LineIcon,
+  MouseIcon,
+} from '@/common/components/Icons/common'
 import { NetworkContext } from '@/common/context'
 import useClient from '@/common/hooks/useClient'
 import useContract from '@/common/hooks/useContract'
@@ -172,7 +180,7 @@ const Page: React.FunctionComponent = () => {
                 {formatNumberBalance(totalPlays, 0)}
               </Typography>
             </div>
-            <div className="flex justify-center mt-10">
+            <div className="flex justify-center no-select mt-10">
               <div
                 onClick={async (e) => {
                   if (accountIsCreated) {
@@ -181,12 +189,15 @@ const Page: React.FunctionComponent = () => {
                     notification.error({ message: 'You need to fund the game wallet with apt first.' })
                   }
                 }}
-                className="w-[320px] sm:w-[420px] tickle-box h-[320px] sm:h-[420px] flex justify-center items-center bg-[#EEC5C7] rounded-full"
+                className="w-[320px] no-select sm:w-[420px] tickle-box h-[320px] sm:h-[420px] flex justify-center items-center bg-[#EEC5C7] rounded-full"
               >
                 <div>
-                  <div className={'cat'}>
+                  <div className={'cat pointer-events-none w-[200px] h-[200px] flex items-center justify-center'}>
+                    {totalFood === 0 && <CatDefault className={'w-[150px] sm:w-[200px] h-auto'} />}
                     {totalFood === maxFoodAmount && <CatTickleLimit className={'w-[150px] sm:w-[180px] h-auto'} />}
-                    {totalFood !== maxFoodAmount && <CatTicker className={'w-[200px] sm:w-[255px] h-auto'} />}
+                    {totalFood > 0 && totalFood < maxFoodAmount && (
+                      <CatTicker className={'w-[200px] sm:w-[255px] h-auto'} />
+                    )}
                   </div>
                   <div
                     className={
@@ -199,7 +210,7 @@ const Page: React.FunctionComponent = () => {
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-3 mt-10">
+            <div className="flex items-center pointer-events-none gap-3 mt-10">
               <span className="text-[#080708] text-lg no-select exo-2">{totalFood}</span>
               <Progress
                 className=""

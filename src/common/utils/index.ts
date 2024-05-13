@@ -24,9 +24,7 @@ function createParticle(x: number, y: number, type: string) {
   const destinationY = -300
   const rotation = 0
   const delay = 100
-  const arr = ['/apple.png', '/banana.png', '/peach.png', '/watermelon.png', '/strawberry.png']
-  const image = arr[Math.floor(Math.random() * arr.length)]
-  particle.style.backgroundImage = `url(${image})`
+  particle.style.backgroundImage = `url(/heart.png)`
   particle.style.width = `${width}px`
   particle.style.height = `${height}px`
   const animation = particle.animate(

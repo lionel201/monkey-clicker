@@ -7,6 +7,8 @@ import { NetworkContext } from '@/common/context'
 import { setData } from '@/common/hooks/useLocalstorage'
 import { useModal } from '@/common/hooks/useModal'
 import { TickleStep } from '@/common/components/TickleStep'
+import { Ed25519PrivateKey } from '@aptos-labs/ts-sdk'
+import useClient from '@/common/hooks/useClient'
 
 export enum WARNING_MODE {
   NEW_WALLET,
@@ -21,7 +23,7 @@ export default function Home() {
   const [error, setError] = useState('')
   const [isImportSuccess, setIsImportSuccess] = useState<boolean>(false)
   const { show, setShow, toggle } = useModal()
-
+  const { aptos } = useClient()
   const {
     addressContext: [addressContext, setAddressContext],
     secretKeyContext: [secretKeyContext, setSecretKeyContext],
@@ -31,9 +33,10 @@ export default function Home() {
     setSecretKey(secretKeyContext)
   }, [secretKeyContext])
 
-  const handleShowImport = () => {
+  const handleShowImport = async () => {
     try {
-      const account = new AptosAccount(new HexString(secretKeyInput as any).toUint8Array())
+      const privateKey = new Ed25519PrivateKey(secretKeyInput as any)
+      const account = await aptos.deriveAccountFromPrivateKey({ privateKey })
       if (account) {
         setMode(WARNING_MODE.IMPORT_WALLET)
         setShow(true)
@@ -49,13 +52,14 @@ export default function Home() {
     setShow(true)
   }
 
-  const handleImport = () => {
+  const handleImport = async () => {
     try {
-      const account = new AptosAccount(new HexString(secretKeyInput as any).toUint8Array())
+      const privateKey = new Ed25519PrivateKey(secretKeyInput as any)
+      const account = await aptos.deriveAccountFromPrivateKey({ privateKey })
       if (account) {
-        setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.signingKey.secretKey).toString()))
-        setAddressContext(account.address().toString())
-        setSecretKeyContext(HexString.fromUint8Array(account.signingKey.secretKey).toString())
+        setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.privateKey.toUint8Array()).toString()))
+        setAddressContext(account.accountAddress.toString())
+        setSecretKeyContext(HexString.fromUint8Array(account.privateKey.toUint8Array()).toString())
         setIsImportSuccess(true)
         setIsImport(false)
         toggle()

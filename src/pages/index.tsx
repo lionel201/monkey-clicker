@@ -17,6 +17,7 @@ import useClient from '@/common/hooks/useClient'
 import useContract from '@/common/hooks/useContract'
 import { getDiff, pop } from '@/common/utils'
 import { formatNumberBalance } from '@/utils'
+import { Account, Ed25519PrivateKey } from '@aptos-labs/ts-sdk'
 
 const maxFoodAmount = 500
 
@@ -27,7 +28,7 @@ const Page: React.FunctionComponent = () => {
   const [totalFood, setTotalFood] = useState(0)
   const [accountIsCreated, setAccountIsCreated] = useState(true)
   const { view } = useContract()
-  const { aptosClient, CLICKER_RESOURCE_ACCOUNT } = useClient()
+  const { aptosClient, CLICKER_RESOURCE_ACCOUNT, aptos } = useClient()
 
   const {
     secretKeyContext: [secretKey],
@@ -52,11 +53,13 @@ const Page: React.FunctionComponent = () => {
 
   const getAccountInfo = async () => {
     try {
-      const account = new AptosAccount(new HexString(secretKey as any).toUint8Array())
+      const privateKey = new Ed25519PrivateKey(secretKey)
+      const account = await aptos.deriveAccountFromPrivateKey({ privateKey })
+      console.log('account', account)
       if (account) {
         setAccountIsCreated(true)
       }
-      const genesisAccount = await aptosClient.getAccount(account.address())
+      const genesisAccount = await aptosClient.getAccount(account.accountAddress.toString())
       setSequenceNumber(genesisAccount.sequence_number)
     } catch (e: any) {
       console.log(e)
@@ -69,11 +72,12 @@ const Page: React.FunctionComponent = () => {
   const { data: current_plays = 0 } = useQuery({
     queryKey: ['currentPlays', secretKey],
     queryFn: async () => {
-      const account = new AptosAccount(new HexString(secretKey as any).toUint8Array())
+      const privateKey = new Ed25519PrivateKey(secretKey)
+      const account = await aptos.deriveAccountFromPrivateKey({ privateKey })
       const payload = {
         function: `${CLICKER_RESOURCE_ACCOUNT}::clickr::current_plays`,
-        type_arguments: [],
-        arguments: [account.address().toString()],
+        typeArguments: [],
+        functionArguments: [account.accountAddress.toString()],
       }
       const res = await view(payload)
       return Number(res[0])
@@ -86,8 +90,8 @@ const Page: React.FunctionComponent = () => {
     queryFn: async () => {
       const payload = {
         function: `${CLICKER_RESOURCE_ACCOUNT}::clickr::end_time`,
-        type_arguments: [],
-        arguments: [],
+        typeArguments: [],
+        functionArguments: [],
       }
       const res = await view(payload)
       return Number(res[0])

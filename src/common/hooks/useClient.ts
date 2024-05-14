@@ -9,6 +9,7 @@ import {
   TESTNET_NODE_URL,
 } from '@/config/aptosConstants'
 import { NetworkContext } from '@/common/context'
+import { Aptos, AptosConfig } from '@aptos-labs/ts-sdk'
 
 const useClient = () => {
   const {
@@ -27,14 +28,19 @@ const useClient = () => {
 
   const CLICKER_RESOURCE_ACCOUNT =
     networkContext === Network.TESTNET ? CLICKER_RESOURCE_ACCOUNT_TESTNET : CLICKER_RESOURCE_ACCOUNT_MAINNET
+  const aptosConfig = new AptosConfig({
+    network: networkContext === Network.TESTNET ? Network.TESTNET : Network.MAINNET,
+    fullnode: networkContext === Network.TESTNET ? TESTNET_NODE_URL : MAINNET_NODE_URL,
+  })
 
+  const aptos = new Aptos(aptosConfig)
   const provider = new Provider(networkContext === Network.TESTNET ? Network.TESTNET : Network.MAINNET)
   const coinClient = new CoinClient(provider)
   const fungibleAsset = new FungibleAssetClient(provider)
   const indexerClient = new IndexerClient(
     networkContext === Network.TESTNET ? TESTNET_INDEXER_URL : MAINNET_INDEXER_URL,
   )
-  return { coinClient, aptosClient, fungibleAsset, provider, indexerClient, CLICKER_RESOURCE_ACCOUNT }
+  return { coinClient, aptosClient, fungibleAsset, provider, indexerClient, CLICKER_RESOURCE_ACCOUNT, aptos }
 }
 
 export default useClient

@@ -7,7 +7,6 @@ import { NetworkContext } from '@/common/context'
 import { getData, setData } from '@/common/hooks/useLocalstorage'
 import { faucetClient } from '@/config/aptosClient'
 import { Account, Ed25519PrivateKey } from '@aptos-labs/ts-sdk'
-import useClient from '@/common/hooks/useClient'
 
 export const LayoutPage: React.FunctionComponent<{ children: ReactNode }> = ({ children }) => {
   const {
@@ -15,18 +14,21 @@ export const LayoutPage: React.FunctionComponent<{ children: ReactNode }> = ({ c
     secretKeyContext: [secretKey, setSecretKeyContext],
     addressContext: [_, setAddressContext],
   } = useContext(NetworkContext)
-  const { aptos } = useClient()
+
   useEffect(() => {
     ;(async () => {
-      const secretKeyLocal = getData('secretKey')
-      if (secretKeyLocal) {
-        const privateKey = new Ed25519PrivateKey(secretKey)
-        const account = await aptos.deriveAccountFromPrivateKey({ privateKey })
-        console.log('account', account)
-        setAddressContext(account.accountAddress.toString())
-        setSecretKeyContext(JSON.parse(secretKeyLocal))
-      } else {
-        await generateNewAccount()
+      try {
+        const secretKeyLocal = getData('secretKey')
+        if (secretKeyLocal) {
+          const privateKey = new Ed25519PrivateKey(secretKey)
+          const account = Account.fromPrivateKey({ privateKey })
+          setAddressContext(account.accountAddress.toString())
+          setSecretKeyContext(JSON.parse(secretKeyLocal))
+        } else {
+          await generateNewAccount()
+        }
+      } catch (e) {
+        console.log(e)
       }
     })()
   }, [secretKey])

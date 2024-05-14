@@ -1,4 +1,4 @@
-import { Button, Input, Typography } from 'antd'
+import { Button, Divider, Input, Tooltip, Typography } from 'antd'
 import { AptosAccount, HexString } from 'aptos'
 import { useContext, useEffect, useState } from 'react'
 
@@ -7,8 +7,14 @@ import { NetworkContext } from '@/common/context'
 import { setData } from '@/common/hooks/useLocalstorage'
 import { useModal } from '@/common/hooks/useModal'
 import { TickleStep } from '@/common/components/TickleStep'
-import { Ed25519PrivateKey } from '@aptos-labs/ts-sdk'
+import { Account, Ed25519PrivateKey } from '@aptos-labs/ts-sdk'
 import useClient from '@/common/hooks/useClient'
+import { copyToClipboard, ellipseAddress, formatNumberBalance } from '@/utils'
+import { Avatar, CopyIcon } from '@/common/components/Icons/common'
+import { useQuery } from '@tanstack/react-query'
+import useBalanceToken from '@/common/hooks/useBalanceToken'
+import BigNumber from 'bignumber.js'
+import useContract from '@/common/hooks/useContract'
 
 export enum WARNING_MODE {
   NEW_WALLET,
@@ -16,6 +22,8 @@ export enum WARNING_MODE {
 }
 
 export default function Home() {
+  const [loading, setLoading] = useState(false)
+  const [copyText, setCopyText] = useState('Copy')
   const [mode, setMode] = useState(WARNING_MODE.NEW_WALLET)
   const [secretKey, setSecretKey] = useState<HexString | string>('')
   const [isImport, setIsImport] = useState<boolean>(false)
@@ -23,7 +31,9 @@ export default function Home() {
   const [error, setError] = useState('')
   const [isImportSuccess, setIsImportSuccess] = useState<boolean>(false)
   const { show, setShow, toggle } = useModal()
-  const { aptos } = useClient()
+  const { CLICKER_RESOURCE_ACCOUNT, aptos } = useClient()
+  const { getBalanceCoin } = useBalanceToken()
+  const { view } = useContract()
   const {
     addressContext: [addressContext, setAddressContext],
     secretKeyContext: [secretKeyContext, setSecretKeyContext],
@@ -33,15 +43,41 @@ export default function Home() {
     setSecretKey(secretKeyContext)
   }, [secretKeyContext])
 
+  const { data: aptBalance = 0 } = useQuery({
+    queryKey: ['getAptBalance', addressContext],
+    queryFn: async () => {
+      const balance = await getBalanceCoin(addressContext.toString(), '0x1::aptos_coin::AptosCoin')
+      return BigNumber(balance).div(BigNumber(10).pow(8)).toNumber()
+    },
+  })
+
+  const { data: current_plays = 0 } = useQuery({
+    queryKey: ['currentPlays', addressContext],
+    queryFn: async () => {
+      const payload = {
+        function: `${CLICKER_RESOURCE_ACCOUNT}::clickr::current_plays`,
+        typeArguments: [],
+        functionArguments: [addressContext.toString()],
+      }
+      const res = await view(payload)
+      return Number(res[0])
+    },
+    enabled: !!secretKey,
+  })
+
   const handleShowImport = async () => {
     try {
+      setLoading(true)
       const privateKey = new Ed25519PrivateKey(secretKeyInput as any)
-      const account = await aptos.deriveAccountFromPrivateKey({ privateKey })
+      const account = Account.fromPrivateKey({ privateKey })
+      console.log('account', account)
       if (account) {
         setMode(WARNING_MODE.IMPORT_WALLET)
         setShow(true)
+        setLoading(false)
       }
     } catch (e: any) {
+      setLoading(false)
       setIsImportSuccess(false)
       setError(e.message)
     }
@@ -55,7 +91,7 @@ export default function Home() {
   const handleImport = async () => {
     try {
       const privateKey = new Ed25519PrivateKey(secretKeyInput as any)
-      const account = await aptos.deriveAccountFromPrivateKey({ privateKey })
+      const account = Account.fromPrivateKey({ privateKey })
       if (account) {
         setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.privateKey.toUint8Array()).toString()))
         setAddressContext(account.accountAddress.toString())
@@ -73,10 +109,10 @@ export default function Home() {
 
   const handleGenerateNewWallet = () => {
     try {
-      const account = new AptosAccount()
-      setSecretKeyContext(account.address().toString())
-      setSecretKey(HexString.fromUint8Array(account.signingKey.secretKey).toString())
-      setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.signingKey.secretKey).toString()))
+      const account = Account.generate()
+      setSecretKeyContext(account.accountAddress.toString())
+      setSecretKey(HexString.fromUint8Array(account.privateKey.toUint8Array()).toString())
+      setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.privateKey.toUint8Array()).toString()))
       setIsImportSuccess(true)
       toggle()
     } catch (e) {
@@ -85,33 +121,81 @@ export default function Home() {
     }
   }
 
+  const handleCopy = (value: string) => {
+    setCopyText('Copied!')
+    setTimeout(() => {
+      setCopyText('Copy')
+    }, 1000)
+    copyToClipboard(value)
+  }
+
   return (
     <div className="pt-10 sm:pt-20 pb-20 px-5">
       <h1 className="text-[#000000] text-center text-2xl sm:text-3xl font-semibold">Your Tickle Wallet</h1>
       <TickleStep />
-      <div className={'max-w-[570px] mx-auto text-center '}>
-        <Typography className="text-[#000000] font-semibold mt-16 text-lg">Your Aptos address:</Typography>
-        <p className="mt-3">
-          This is the Aptos address of your spam wallet. Send $APT to this address to fund your wallet and start mining.
+      <div className={'max-w-[580px] mx-auto '}>
+        <Typography className="text-[#000000] font-semibold mt-16 text-lg text-center ">Your Aptos address:</Typography>
+        <p className="mt-3 font-medium text-center ">
+          This is the Aptos address of your Ticklr wallet. Send $APT to this address to fund your Ticklr wallet and
+          start your game.
         </p>
         <div
           style={{ wordBreak: 'break-word' }}
-          className="bg-[#ff000026] flex items-center justify-center text-[#000] text-center border-0 mt-8 min-h-14 p-5 rounded-[16px]"
+          className="bg-[#EEC5C7]  text-[#000] border-0 mt-8 min-h-14 p-5 rounded-[16px]"
         >
-          {addressContext.toString() as any}
+          <div className={'flex justify-between w-full items-center'}>
+            <div className={'font-medium'}>
+              <div className={'text-base'}>Home</div>
+              <div className={'flex items-center gap-2'}>
+                <div>Account ({ellipseAddress(addressContext.toString(), 5)})</div>
+                <Tooltip title={copyText}>
+                  <div onClick={() => handleCopy(addressContext.toString())} className={'cursor-pointer'}>
+                    <CopyIcon />
+                  </div>
+                </Tooltip>
+              </div>
+            </div>
+            <Avatar />
+          </div>
+          <Divider className={'border-t border-[#F9F4F3]'} />
+          <div className={'flex justify-between text-base font-medium'}>
+            <div>APT Balance</div>
+            <span className={'font-bold'}>{formatNumberBalance(aptBalance, 2)}</span>
+          </div>
+          <div className={'flex justify-between text-base font-medium mt-5'}>
+            <div>$HEART Balance</div>
+            <span className={'font-bold text-[#CA5C3B] exo-2'}>{formatNumberBalance(current_plays, 0)} </span>
+          </div>
+          <Button
+            className={'font-medium bg-[#CA5C3B] rounded-[100px] text-base text-[#fff] w-full border-0 mt-5 h-11'}
+          >
+            Send
+          </Button>
         </div>
 
-        <div className="text-center max-w-[570px] mx-auto mt-10">
+        <div className="text-center max-w-[580px] mx-auto mt-10">
           <h1 className="text-[#000000] text-center text-2xl font-semibold">Your secret key:</h1>
-          <p className="mt-3">
-            This is the private key of your spam wallet. Import it into a Aptos mobile or browser wallet to withdraw the
-            $APT you mine.
-          </p>
+          <div className={'space-y-1'}>
+            <p className="mt-3 font-medium">
+              This is the private key of your Ticklr wallet. Import it into a Aptos mobile or browser wallet to withdraw
+              the $HEART you mine.
+            </p>
+            <p className="font-medium">
+              Your Ticklr wallet is stored in your browser, only you have access to it. Clearing cookies will delete
+              your wallet, and we cannot recover it for you.
+            </p>
+          </div>
+          <p className="font-medium">Copy your secret key and keep it safe, this allows you to restore your wallet.</p>
           <div
             style={{ wordBreak: 'break-word' }}
-            className="bg-[#ff000026] text-[#000] border-0 mt-8 min-h-14 flex items-center rounded-[16px] p-5"
+            className="bg-[#ff000026] text-[#000] gap-2 font-medium justify-center text-center border-0 mt-8 min-h-14 flex items-start rounded-[16px] p-5"
           >
             {secretKey as string}
+            <Tooltip title={copyText}>
+              <div onClick={() => handleCopy(secretKey.toString())} className={'cursor-pointer'}>
+                <CopyIcon />
+              </div>
+            </Tooltip>
           </div>
 
           <p className="text-[#FF6464] mt-3">{`Don't share your secret key with anyone`}</p>
@@ -146,6 +230,8 @@ export default function Home() {
               />
               <div>
                 <Button
+                  loading={loading}
+                  disabled={loading}
                   onClick={handleShowImport}
                   className="bg-[#CA5C3B] text-[#fff] mt-5 border-0 font-medium rounded-[100px] h-10 min-w-[100px]"
                 >
@@ -162,14 +248,9 @@ export default function Home() {
           )}
           {isImportSuccess && <p className="text-[#90ee90] font-semibold text-base mt-5">Success</p>}
         </div>
-        <div className="text-center mt-14">
-          <Typography className="text-[#000000] font-semibold  text-lg">Back up your secret key!</Typography>
-          <p className="font-medium mt-3">Your tickle wallet is stored in your browser, only you have access to it.</p>
-          <p className="font-medium">Clearing cookies will delete your wallet, and we cannot recover it for you.</p>
-          <p className="font-medium">Copy your secret key and keep it safe, this allows you to restore your wallet.</p>
-        </div>
       </div>
       <ModalWarningImportWallet
+        loading={loading}
         isModalOpen={!!show}
         handleClose={toggle}
         onOk={() => (mode === WARNING_MODE.IMPORT_WALLET ? handleImport() : handleGenerateNewWallet())}

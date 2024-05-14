@@ -54,7 +54,7 @@ const Page: React.FunctionComponent = () => {
   const getAccountInfo = async () => {
     try {
       const privateKey = new Ed25519PrivateKey(secretKey)
-      const account = await aptos.deriveAccountFromPrivateKey({ privateKey })
+      const account = Account.fromPrivateKey({ privateKey })
       console.log('account', account)
       if (account) {
         setAccountIsCreated(true)
@@ -73,7 +73,7 @@ const Page: React.FunctionComponent = () => {
     queryKey: ['currentPlays', secretKey],
     queryFn: async () => {
       const privateKey = new Ed25519PrivateKey(secretKey)
-      const account = await aptos.deriveAccountFromPrivateKey({ privateKey })
+      const account = Account.fromPrivateKey({ privateKey })
       const payload = {
         function: `${CLICKER_RESOURCE_ACCOUNT}::clickr::current_plays`,
         typeArguments: [],

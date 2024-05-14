@@ -31,3 +31,12 @@ export const formatNumberBalance = (number: number | string = '0', infractionDig
 export function ellipseAddress(address: string = '', width: number = 10): string {
   return `${String(address).slice(0, width)}...${String(address).slice(-width)}`
 }
+
+export const copyToClipboard = (text: string) => {
+  const textField = document.createElement('textarea')
+  textField.innerText = text
+  document.body.appendChild(textField)
+  textField.select()
+  document.execCommand('copy')
+  textField.remove()
+}

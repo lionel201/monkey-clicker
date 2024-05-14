@@ -1,4 +1,4 @@
-export const DEVNET_NODE_URL = 'https://fullnode.devnet.aptoslabs.com/v1'
+export const DEVNET_NODE_URL = 'https://api.devnet.aptoslabs.com/v1'
 export const TESTNET_NODE_URL = 'https://api.testnet.aptoslabs.com/v1'
 export const MAINNET_NODE_URL = 'https://api.mainnet.aptoslabs.com/v1'
 export const DEVNET_FAUCET_URL = 'https://faucet.devnet.aptoslabs.com'

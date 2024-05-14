@@ -20,9 +20,9 @@ export const LayoutPage: React.FunctionComponent<{ children: ReactNode }> = ({ c
     ;(async () => {
       const secretKeyLocal = getData('secretKey')
       if (secretKeyLocal) {
-        console.log('secretKey', secretKey)
         const privateKey = new Ed25519PrivateKey(secretKey)
         const account = await aptos.deriveAccountFromPrivateKey({ privateKey })
+        console.log('account', account)
         setAddressContext(account.accountAddress.toString())
         setSecretKeyContext(JSON.parse(secretKeyLocal))
       } else {
@@ -34,7 +34,6 @@ export const LayoutPage: React.FunctionComponent<{ children: ReactNode }> = ({ c
   const generateNewAccount = async () => {
     try {
       const account = Account.generate()
-      console.log('account', account)
       if (network === Network.TESTNET) {
         try {
           await faucetClient.fundAccount(account.accountAddress.toString(), 100_000_000)

@@ -57,9 +57,9 @@ export default function Home() {
       const privateKey = new Ed25519PrivateKey(secretKeyInput as any)
       const account = await aptos.deriveAccountFromPrivateKey({ privateKey })
       if (account) {
-        setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.privateKey).toString()))
+        setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.privateKey.toUint8Array()).toString()))
         setAddressContext(account.accountAddress.toString())
-        setSecretKeyContext(HexString.fromUint8Array(account.signingKey.secretKey).toString())
+        setSecretKeyContext(HexString.fromUint8Array(account.privateKey.toUint8Array()).toString())
         setIsImportSuccess(true)
         setIsImport(false)
         toggle()

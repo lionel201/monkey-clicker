@@ -2,15 +2,15 @@ import useClient from '@/common/hooks/useClient'
 
 interface ViewRequests {
   function: string
-  type_arguments: any[]
-  arguments: any[]
+  typeArguments: any[]
+  functionArguments: any[]
 }
 
 const useContract = () => {
-  const { provider } = useClient()
+  const { aptos } = useClient()
 
-  const view = async (payload: ViewRequests) => {
-    return await provider.view(payload)
+  const view = async (payload: any) => {
+    return await aptos.view({ payload })
   }
 
   return { view }

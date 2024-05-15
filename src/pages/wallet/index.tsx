@@ -1,5 +1,5 @@
 import { Button, Divider, Input, Tooltip, Typography } from 'antd'
-import { AptosAccount, HexString } from 'aptos'
+import { AptosAccount, HexString, Network } from 'aptos'
 import { useContext, useEffect, useState } from 'react'
 
 import { ModalWarningImportWallet } from '@/common/components/Modals/ModalWarningImportWallet'
@@ -15,6 +15,7 @@ import { useQuery } from '@tanstack/react-query'
 import useBalanceToken from '@/common/hooks/useBalanceToken'
 import BigNumber from 'bignumber.js'
 import useContract from '@/common/hooks/useContract'
+import { faucetClient } from '@/config/aptosClient'
 
 export enum WARNING_MODE {
   NEW_WALLET,
@@ -35,6 +36,7 @@ export default function Home() {
   const { getBalanceCoin } = useBalanceToken()
   const { view } = useContract()
   const {
+    networkContext: [network],
     addressContext: [addressContext, setAddressContext],
     secretKeyContext: [secretKeyContext, setSecretKeyContext],
   } = useContext(NetworkContext)
@@ -107,12 +109,23 @@ export default function Home() {
     }
   }
 
-  const handleGenerateNewWallet = () => {
+  const faucetAptTestnet = async (accountAddress: string) => {
+    if (network === Network.TESTNET) {
+      try {
+        await faucetClient.fundAccount(accountAddress.toString(), 100_000_000)
+      } catch (e) {
+        console.log(e)
+      }
+    }
+  }
+
+  const handleGenerateNewWallet = async () => {
     try {
       const account = Account.generate()
       setSecretKeyContext(account.accountAddress.toString())
       setSecretKey(HexString.fromUint8Array(account.privateKey.toUint8Array()).toString())
       setData('secretKey', JSON.stringify(HexString.fromUint8Array(account.privateKey.toUint8Array()).toString()))
+      await faucetAptTestnet(account.accountAddress.toString())
       setIsImportSuccess(true)
       toggle()
     } catch (e) {

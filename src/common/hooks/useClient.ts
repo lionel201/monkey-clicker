@@ -16,8 +16,6 @@ const useClient = () => {
     networkContext: [networkContext],
   } = useContext(NetworkContext)
 
-  console.log('networkContext', networkContext)
-
   const { aptosClient } = useMemo(() => {
     return {
       aptosClient:

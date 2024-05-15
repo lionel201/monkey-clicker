@@ -72,7 +72,6 @@ export default function Home() {
       setLoading(true)
       const privateKey = new Ed25519PrivateKey(secretKeyInput as any)
       const account = Account.fromPrivateKey({ privateKey })
-      console.log('account', account)
       if (account) {
         setMode(WARNING_MODE.IMPORT_WALLET)
         setShow(true)

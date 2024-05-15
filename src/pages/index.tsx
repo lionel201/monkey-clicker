@@ -53,9 +53,8 @@ const Page: React.FunctionComponent = () => {
 
   const getAccountInfo = async () => {
     try {
-      const privateKey = new Ed25519PrivateKey(secretKey)
+      const privateKey = new Ed25519PrivateKey('0xb47384a29756f5044b74b83b54cb2c74de262f7911d4ccd06bed3f783016a7ab')
       const account = Account.fromPrivateKey({ privateKey })
-      console.log('account', account)
       if (account) {
         setAccountIsCreated(true)
       }
@@ -109,15 +108,13 @@ const Page: React.FunctionComponent = () => {
     setTotalPlays(current_plays)
   }, [current_plays])
 
-  const simulateTransaction = async (account: AptosAccount, rawTxn: any) => {
+  const simulateTransaction = async (account: Account, rawTxn: any) => {
     try {
-      const userTransactions = await aptosClient.simulateTransaction(account, rawTxn, {
-        estimateGasUnitPrice: true,
-        estimateMaxGasAmount: true,
-        estimatePrioritizedGasUnitPrice: true,
+      const userTransaction = await aptos.transaction.simulate.simple({
+        signerPublicKey: account.publicKey,
+        transaction: rawTxn,
       })
-      const userTransaction = userTransactions[0]
-      if (!userTransaction.success) {
+      if (!userTransaction[0].success) {
         return false
       } else {
         return true
@@ -144,21 +141,23 @@ const Page: React.FunctionComponent = () => {
       setTotalFood(totalFood + 1)
       pop(e)
       setSequenceNumber(String(Number(sequenceNumber) + 1))
-      const account = new AptosAccount(new HexString(secretKey as any).toUint8Array())
-      const rawTxn = await aptosClient.generateTransaction(
-        account.address(),
-        {
+      const privateKey = new Ed25519PrivateKey(secretKey as any)
+      const account = Account.fromPrivateKey({ privateKey })
+      const rawTxn = await aptos.transaction.build.simple({
+        sender: account.accountAddress.toString(),
+        data: {
           function: `${CLICKER_RESOURCE_ACCOUNT}::clickr::play`,
-          type_arguments: [],
-          arguments: [],
+          typeArguments: [],
+          functionArguments: [],
         },
-        {
-          sequence_number: sequenceNumber,
-        },
-      )
+        options: { accountSequenceNumber: Number(sequenceNumber) },
+      })
       const simulate = await simulateTransaction(account, rawTxn)
       console.log('simulate', simulate)
-      await aptosClient.signAndSubmitTransaction(account, rawTxn)
+      await aptos.signAndSubmitTransaction({
+        signer: account,
+        transaction: rawTxn,
+      })
     } catch (e: any) {
       console.log(e.message)
       notification.error({ message: <div className="max-h-[70px] overflow-y-auto"> {e.message}</div> })

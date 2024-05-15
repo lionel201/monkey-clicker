@@ -53,7 +53,7 @@ const Page: React.FunctionComponent = () => {
 
   const getAccountInfo = async () => {
     try {
-      const privateKey = new Ed25519PrivateKey('0xb47384a29756f5044b74b83b54cb2c74de262f7911d4ccd06bed3f783016a7ab')
+      const privateKey = new Ed25519PrivateKey(secretKey)
       const account = Account.fromPrivateKey({ privateKey })
       if (account) {
         setAccountIsCreated(true)
@@ -120,6 +120,7 @@ const Page: React.FunctionComponent = () => {
         return true
       }
     } catch (e) {
+      console.log('eee', e)
       throw e
     }
   }

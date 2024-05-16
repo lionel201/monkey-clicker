@@ -16,6 +16,7 @@ import useBalanceToken from '@/common/hooks/useBalanceToken'
 import BigNumber from 'bignumber.js'
 import useContract from '@/common/hooks/useContract'
 import { faucetClient } from '@/config/aptosClient'
+import { ModalTransferToken } from '@/common/components/Modals/ModalTransferToken'
 
 export enum WARNING_MODE {
   NEW_WALLET,
@@ -32,6 +33,7 @@ export default function Home() {
   const [error, setError] = useState('')
   const [isImportSuccess, setIsImportSuccess] = useState<boolean>(false)
   const { show, setShow, toggle } = useModal()
+  const { show: showSendToken, setShow: setShowSendToken, toggle: toggleSendToken } = useModal()
   const { CLICKER_RESOURCE_ACCOUNT, aptos } = useClient()
   const { getBalanceCoin } = useBalanceToken()
   const { view } = useContract()
@@ -45,7 +47,7 @@ export default function Home() {
     setSecretKey(secretKeyContext)
   }, [secretKeyContext])
 
-  const { data: aptBalance = 0 } = useQuery({
+  const { data: aptBalance = 0, refetch } = useQuery({
     queryKey: ['getAptBalance', addressContext],
     queryFn: async () => {
       const balance = await getBalanceCoin(addressContext.toString(), '0x1::aptos_coin::AptosCoin')
@@ -179,6 +181,7 @@ export default function Home() {
             <span className={'font-bold text-[#CA5C3B] exo-2'}>{formatNumberBalance(current_plays, 0)} </span>
           </div>
           <Button
+            onClick={() => setShowSendToken(true)}
             className={'font-medium bg-[#CA5C3B] rounded-[100px] text-base text-[#fff] w-full border-0 mt-5 h-11'}
           >
             Send
@@ -267,6 +270,7 @@ export default function Home() {
         handleClose={toggle}
         onOk={() => (mode === WARNING_MODE.IMPORT_WALLET ? handleImport() : handleGenerateNewWallet())}
       />
+      <ModalTransferToken isModalOpen={!!showSendToken} handleClose={toggleSendToken} refetch={refetch} />
     </div>
   )
 }

@@ -41,7 +41,7 @@ html, body {
 }
 
 .ant-modal-content {
-    background-color: #ffffff !important;
+    background-color: #EEC5C7 !important;
     border-radius: 16px !important;
 }
 
@@ -146,5 +146,9 @@ particle {
     transition-property: all;
     transition-duration: .5s;
     transition-timing-function: cubic-bezier(.4,0,.2,1);
+}
 
+.input-format:focus-visible{
+    border:0 !important;
+    outline: none !important;
 }

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { notification, Progress, Typography } from 'antd'
+import { Button, Checkbox, notification, Progress, Radio, Switch, Typography } from 'antd'
 import { AptosAccount, HexString } from 'aptos'
 import React, { useContext, useEffect, useState } from 'react'
 
@@ -18,6 +18,8 @@ import useContract from '@/common/hooks/useContract'
 import { getDiff, pop } from '@/common/utils'
 import { formatNumberBalance } from '@/utils'
 import { Account, Ed25519PrivateKey } from '@aptos-labs/ts-sdk'
+import CountdownClaim from '@/common/components/CountdownClaim'
+import { CLAIM_START_TIME } from '@/common/consts'
 
 const maxFoodAmount = 500
 
@@ -27,6 +29,8 @@ const Page: React.FunctionComponent = () => {
   const [totalPlays, setTotalPlays] = useState(0)
   const [totalFood, setTotalFood] = useState(0)
   const [accountIsCreated, setAccountIsCreated] = useState(true)
+  const [isClaimStarted, setIsClaimStarted] = useState(getDiff(CLAIM_START_TIME * 1000) < 0)
+  const [auto, setAuto] = useState(false)
   const { view } = useContract()
   const { aptosClient, CLICKER_RESOURCE_ACCOUNT, aptos } = useClient()
 
@@ -83,6 +87,21 @@ const Page: React.FunctionComponent = () => {
     },
     enabled: !!secretKey,
   })
+  const { data: totalCrrPlay = 0 } = useQuery({
+    queryKey: ['currentTotalPlays', secretKey],
+    queryFn: async () => {
+      const payload = {
+        function: `${CLICKER_RESOURCE_ACCOUNT}::clickr::curr_total_plays`,
+        typeArguments: [],
+        functionArguments: [],
+      }
+      const res = await view(payload)
+      return Number(res[0])
+    },
+    enabled: !!secretKey,
+  })
+
+  console.log('totalPlay', totalCrrPlay)
 
   const { data: endTime = 0, isFetching } = useQuery({
     queryKey: ['isEnded', secretKey],
@@ -165,75 +184,116 @@ const Page: React.FunctionComponent = () => {
     }
   }
 
+  const handleChangeAuto = (checked: boolean) => {
+    console.log(`switch to ${checked}`)
+    setAuto(checked)
+  }
+
   return (
-    <div className="game-layout relative flex  justify-center items-center py-10">
-      {!loading ? (
-        <div>
-          <div className={'absolute bottom-0 hidden sm:block left-0'}>
-            <LineIcon />
-            <div className={'absolute -right-20 top-5'}>
-              <MouseIcon />
-            </div>
+    <div className="game-layout relative z-10 flex  justify-center py-10">
+      <div>
+        <div className={'text-center'}>
+          <div className={'flex justify-center'}>
+            <CountdownClaim
+              endAt={CLAIM_START_TIME}
+              onMomentChange={() => {
+                setIsClaimStarted(true)
+              }}
+            />
           </div>
-          <div className="min-w-[350px] ">
-            <div className="flex justify-center items-center gap-3">
-              <div>
-                <HeartIcon />
+          <p className={'text-[#000000] mt-3'}>You can claim the token at the end of the Campaign</p>
+          <Button
+            disabled={!isClaimStarted}
+            className={
+              'bg-[#CA5C3B] text-[#fff] disabled:bg-[#F7D9D0] border-0 text-base rounded-full px-5 h-10 mt-5 min-w-[120px]'
+            }
+          >
+            Claim
+          </Button>
+        </div>
+        {!loading ? (
+          <div className={'mt-16'}>
+            <div className={'absolute bottom-0 hidden sm:block left-0'}>
+              <LineIcon />
+              <div className={'absolute -right-20 top-5'}>
+                <MouseIcon />
               </div>
-              <Typography className="text-5xl text-[#000000] font-black font-pacifico">
-                {formatNumberBalance(totalPlays, 0)}
-              </Typography>
             </div>
-            <div className="flex justify-center no-select mt-10">
-              <div
-                onClick={async (e) => {
-                  if (accountIsCreated) {
-                    await handleClick(e)
-                  } else {
-                    notification.error({ message: 'You need to fund the game wallet with apt first.' })
-                  }
-                }}
-                className="w-[320px] no-select sm:w-[420px] tickle-box h-[320px] sm:h-[420px] flex justify-center items-center bg-[#EEC5C7] rounded-full"
-              >
+            <div className="min-w-[350px] ">
+              <div className="flex justify-center items-center gap-3">
                 <div>
-                  <div className={'cat pointer-events-none w-[200px] h-[200px] flex items-center justify-center'}>
-                    {totalFood === 0 && <CatDefault className={'w-[150px] sm:w-[200px] h-auto'} />}
-                    {totalFood === maxFoodAmount && <CatTickleLimit className={'w-[150px] sm:w-[180px] h-auto'} />}
-                    {totalFood > 0 && totalFood < maxFoodAmount && (
-                      <CatTicker className={'w-[200px] sm:w-[255px] h-auto'} />
-                    )}
-                  </div>
-                  <div
-                    className={
-                      'text-xl sm:text-2xl no-select font-bold pointer-events-none cursor-not-allowed text-[#FFFFFF] text-center mt-5'
+                  <HeartIcon />
+                </div>
+                <Typography className="text-5xl text-[#CA5C3B] font-black font-pacifico">
+                  {formatNumberBalance(totalPlays, 0)}
+                </Typography>
+              </div>
+              <div className="flex justify-center no-select mt-10">
+                <div
+                  onClick={async (e) => {
+                    if (accountIsCreated) {
+                      await handleClick(e)
+                    } else {
+                      notification.error({ message: 'You need to fund the game wallet with apt first.' })
                     }
-                  >
-                    {totalFood === maxFoodAmount && 'meowwwwww......'}
-                    {totalFood !== maxFoodAmount && 'Tickle me to Earn'}
+                  }}
+                  className="w-[320px] no-select sm:w-[420px] tickle-box h-[320px] sm:h-[420px] flex justify-center items-center bg-[#EEC5C7] rounded-full"
+                >
+                  <div>
+                    <div className={'cat pointer-events-none w-[200px] h-[200px] flex items-center justify-center'}>
+                      {totalFood === 0 && <CatDefault className={'w-[150px] sm:w-[200px] h-auto'} />}
+                      {totalFood === maxFoodAmount && <CatTickleLimit className={'w-[150px] sm:w-[180px] h-auto'} />}
+                      {totalFood > 0 && totalFood < maxFoodAmount && (
+                        <CatTicker className={'w-[200px] sm:w-[255px] h-auto'} />
+                      )}
+                    </div>
+                    <div
+                      className={
+                        'text-xl sm:text-2xl no-select font-bold pointer-events-none cursor-not-allowed text-[#FFFFFF] text-center mt-5'
+                      }
+                    >
+                      {totalFood === maxFoodAmount && 'meowwwwww......'}
+                      {totalFood !== maxFoodAmount && 'Tickle me to Earn'}
+                    </div>
                   </div>
                 </div>
               </div>
+              <div className={'flex flex-col'}>
+                <div className="flex items-center pointer-events-none gap-3 mt-10 relative px-5 sm:px-0">
+                  <span className="text-[#080708] text-lg no-select exo-2">{totalFood}</span>
+                  <Progress
+                    className=""
+                    percent={(totalFood / maxFoodAmount) * 100}
+                    trailColor="#101119"
+                    showInfo={false}
+                    status="active"
+                    strokeColor={{
+                      '0%': '#FC90FF',
+                      '100%': '#6C48FF',
+                    }}
+                    strokeWidth={14}
+                  />
+                  <HandIcon />
+                  <div className={'absolute hidden z-[1000] sm:block right-[-100px] text-center'}>
+                    <div className={'text-[#000000] font-medium'}>Auto Tickle</div>
+                    <Switch checked={auto} onChange={handleChangeAuto} />
+                  </div>
+                </div>
+                <div className={'text-center block sm:hidden'}>
+                  <div className={'text-[#000000] font-medium'}>Auto Tickle</div>
+                  <Switch checked={auto} onChange={handleChangeAuto} />
+                </div>
+              </div>
+
+              <div className={'text-center mt-5 text-[#000000]'}>
+                <div>Total transactions: {formatNumberBalance(totalCrrPlay, 0)}</div>
+                <div>Total accounts: 1,234,458</div>
+              </div>
+              <span className="preloader"></span>
             </div>
-            <div className="flex items-center pointer-events-none gap-3 mt-10">
-              <span className="text-[#080708] text-lg no-select exo-2">{totalFood}</span>
-              <Progress
-                className=""
-                percent={(totalFood / maxFoodAmount) * 100}
-                trailColor="#101119"
-                showInfo={false}
-                status="active"
-                strokeColor={{
-                  '0%': '#FC90FF',
-                  '100%': '#6C48FF',
-                }}
-                strokeWidth={14}
-              />
-              <HandIcon />
-            </div>
-            <span className="preloader"></span>
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
     </div>
   )
 }

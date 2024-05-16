@@ -1,3 +1,5 @@
+import { Account } from '@aptos-labs/ts-sdk'
+
 export const formatNumberBalance = (number: number | string = '0', infractionDigit: number = 4) => {
   let formatPrice = ''
   if (Number(number) > 0 && Number(number) < 0.0001) {

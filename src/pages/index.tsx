@@ -17,9 +17,10 @@ import useClient from '@/common/hooks/useClient'
 import useContract from '@/common/hooks/useContract'
 import { getDiff, pop } from '@/common/utils'
 import { formatNumberBalance } from '@/utils'
-import { Account, Ed25519PrivateKey } from '@aptos-labs/ts-sdk'
+import { Account, Ed25519PrivateKey, InputGenerateTransactionPayloadData } from '@aptos-labs/ts-sdk'
 import CountdownClaim from '@/common/components/CountdownClaim'
 import { CLAIM_START_TIME } from '@/common/consts'
+import { getData, setData } from '@/common/hooks/useLocalstorage'
 
 const maxFoodAmount = 500
 
@@ -30,8 +31,10 @@ const Page: React.FunctionComponent = () => {
   const [totalFood, setTotalFood] = useState(0)
   const [accountIsCreated, setAccountIsCreated] = useState(true)
   const [isClaimStarted, setIsClaimStarted] = useState(getDiff(CLAIM_START_TIME * 1000) < 0)
+  const [autoClickInterval, setAutoClickInterval] = useState<any>(null)
+
   const [auto, setAuto] = useState(false)
-  const { view } = useContract()
+  const { view, simulateTransaction } = useContract()
   const { aptosClient, CLICKER_RESOURCE_ACCOUNT, aptos } = useClient()
 
   const {
@@ -39,6 +42,8 @@ const Page: React.FunctionComponent = () => {
   } = useContext(NetworkContext)
 
   useEffect(() => {
+    setData('auto', 'false')
+    setAuto(false)
     const interval = setInterval(() => {
       if (totalFood > 0) {
         setTotalFood(totalFood - 1)
@@ -72,7 +77,7 @@ const Page: React.FunctionComponent = () => {
     }
   }
 
-  const { data: current_plays = 0 } = useQuery({
+  const { data: current_plays = 0, refetch } = useQuery({
     queryKey: ['currentPlays', secretKey],
     queryFn: async () => {
       const privateKey = new Ed25519PrivateKey(secretKey)
@@ -87,6 +92,35 @@ const Page: React.FunctionComponent = () => {
     },
     enabled: !!secretKey,
   })
+
+  useEffect(() => {
+    ;(async () => {
+      if (auto) {
+        const interval = setInterval(function () {
+          handleAutoClick()
+        }, 1000)
+        setAutoClickInterval(interval)
+      } else {
+        clearInterval(autoClickInterval)
+      }
+    })()
+  }, [auto])
+
+  const handleAutoClick = async () => {
+    const privateKey = new Ed25519PrivateKey(secretKey as any)
+    const account = Account.fromPrivateKey({ privateKey })
+    const payloads: InputGenerateTransactionPayloadData[] = []
+    for (let i = 0; i < 5; i += 1) {
+      const txn: InputGenerateTransactionPayloadData = {
+        function: `${CLICKER_RESOURCE_ACCOUNT}::clickr::play`,
+        functionArguments: [],
+      }
+      payloads.push(txn)
+    }
+    await aptos.transaction.batch.forSingleAccount({ sender: account, data: payloads })
+    await refetch()
+  }
+
   const { data: totalCrrPlay = 0 } = useQuery({
     queryKey: ['currentTotalPlays', secretKey],
     queryFn: async () => {
@@ -100,8 +134,6 @@ const Page: React.FunctionComponent = () => {
     },
     enabled: !!secretKey,
   })
-
-  console.log('totalPlay', totalCrrPlay)
 
   const { data: endTime = 0, isFetching } = useQuery({
     queryKey: ['isEnded', secretKey],
@@ -126,23 +158,6 @@ const Page: React.FunctionComponent = () => {
   useEffect(() => {
     setTotalPlays(current_plays)
   }, [current_plays])
-
-  const simulateTransaction = async (account: Account, rawTxn: any) => {
-    try {
-      const userTransaction = await aptos.transaction.simulate.simple({
-        signerPublicKey: account.publicKey,
-        transaction: rawTxn,
-      })
-      if (!userTransaction[0].success) {
-        return false
-      } else {
-        return true
-      }
-    } catch (e) {
-      console.log('eee', e)
-      throw e
-    }
-  }
 
   const handleClick = async (e: any) => {
     if (totalFood >= 500) {
@@ -186,6 +201,7 @@ const Page: React.FunctionComponent = () => {
 
   const handleChangeAuto = (checked: boolean) => {
     console.log(`switch to ${checked}`)
+    setData('auto', checked ? 'true' : 'false')
     setAuto(checked)
   }
 
@@ -274,12 +290,8 @@ const Page: React.FunctionComponent = () => {
                     strokeWidth={14}
                   />
                   <HandIcon />
-                  <div className={'absolute hidden z-[1000] sm:block right-[-100px] text-center'}>
-                    <div className={'text-[#000000] font-medium'}>Auto Tickle</div>
-                    <Switch checked={auto} onChange={handleChangeAuto} />
-                  </div>
                 </div>
-                <div className={'text-center block sm:hidden'}>
+                <div className={'text-center block'}>
                   <div className={'text-[#000000] font-medium'}>Auto Tickle</div>
                   <Switch checked={auto} onChange={handleChangeAuto} />
                 </div>

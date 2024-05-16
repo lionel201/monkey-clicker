@@ -152,3 +152,7 @@ particle {
     border:0 !important;
     outline: none !important;
 }
+
+.ant-switch-checked{
+    background-color: #CA5C3B !important;
+}
